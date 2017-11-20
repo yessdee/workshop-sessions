@@ -1,0 +1,330 @@
+= ALSA ASOC 
+
+== ALSA in Linux Kernel
+
+=== ALSA Introduction
+
+* ALSA Stack has both user space library and a kernel space drivers.
+
+* ALSA lib has APIs to capture, play and mix the audio from the audio
+  player to the hardware.
+
+* ALSA library talks to its counter part ALSA driver available in
+  Linux kernel.
+
+* ALSA driver has ALSA Framework driver which is platform independent
+  and ALSA hardware specific provider driver.
+
+* The ALSA framework drivers specific to SOC is called ASOC. 
+
+=== Alsa Layers
+
+----
+  
+           Application
+
+  +------------------------------+
+  |             ALSA             |
+  |           Library            |
+  +------------------------------+  User Space
+  -----------------------------------------------/dev/snd/pcm0  
+  +------------------------------+  Kernel Space
+  |           ALSA APIs          |
+  |  +-------+        +---------+|
+  |  |  PCM  |        | Control ||
+  +--+-------+--------+---------++
+                |
+  +------------------------------+
+  |                              |
+  |       ALSA ASOC Core         |
+  +------------------------------+
+      |           |           |
+  +-------+  +---------+ +--------+
+  | Codec |  | Machine | |  DAI   |
+  | Driver|  | Driver  | | Driver |
+  +-------+  +---------+ +--------+
+  
+----
+
+
+=== HW Components
+
+* The SOC has audio controllers like I2S controller which transceived
+  audio PCMs to the codec.
+
+* The audio codecs are ADC/DAC which converts PCMs to analog audio for
+  speakers and analog audios to PCM from MIC.
+ 
+* The Audio codecs can be configured through I2C / SPI drivers.
+
+=== HW Components Contd.
+
+----
+
++----------------------------------------------+
+|    +------------------+                      |
+|    |  +------------+  |  PCM  +---------+    |
+|    |  |  I2S       |  |-------|  Audio  |    |
+|    |  | Controller |  |-------|  Codec  |    |
+|    |  +------------+  |       +---------+    |
+|    |                  |          | |         |
+|    |  +------------+  |          | |         |
+|    |  |  I2C       |  |----------+ |         |
+|    |  | Controller |  |------------+         |
+|    |  +------------+  |  Control             |
+|    |  SOC             |                      |
+|    +------------------+                      |
+|    Board                                     |
++----------------------------------------------+
+
+----
+
+=== User Space Components
+
+ * Alsa lib has functions to play, capture and configure the audio in a
+   Linux system.
+
+=== Kernel Naming
+
+ * Codec 
+   
+   - DAC / ADC chips used for audio output & audio input
+
+ * Digital Audio Interface (DAI)
+
+   - Peripheral Interfaces like I2S, PCM of the processor.
+
+ * Machine
+
+   - The representation of the board configuration, representing which
+     DAI of the processor, is connected to which codec and register
+     that as a soundcard.
+
+=== ALSA ASOC Drivers
+
+----
+
++-------------------------+
+|                         |
+|+-----+  Link   +-----+  |
+|| DAI |-------->|Codec|  |
+|+-----+         +-----+  |
+|        Machine          |
++-------------------------+
+
+----
+
+=== ALSA ASOC Drivers Contd.
+
+* Codec Driver
+
+  - Allows to configure the parameters of DAC / ADC using I2C or SPI
+    interface.
+
+* DAI Driver
+
+  - Allows to configure the Audio Controllers like DAI in the SOC.
+
+* Machine Driver
+
+  - is a board specific driver which associates the Codec with DAI.
+
+  - Creates a DAI Link tries to link the DAI and the Codec drivers.
+  
+  - Then registers a soundcard with this DAI Link.
+
+=== Soundcard
+
+* It is the collective audio hardware, which 
+ 
+  - allows to capture, control and play audio samples of type PCM
+    (Pulse Code Modulation).
+
+  - mix the two different audios using Mixer component.
+
+* In PC architecture usually the soundcard is a audio hardware
+  residing in PCI bus, all the capabilities are within the single
+  hardware.
+
+* Soundcard has components like sound devices which can be of PCM
+  instance, or control interface.
+
+* The ALSA architecture for the SOCs is called as ASOC, in which
+  dai_link is the sound device component, which is the DAI+Codec
+  combination.
+
+=== Soundcard Contd.
+
+----
+
++----------------------------------+
+|                                  |
+|   +-------------------------+    |
+|   |                         |    |
+|   |+-----+  Link   +-----+  |    |
+|   || DAI |-------->|Codec|  |    |
+|   |+-----+         +-----+  |    |
+|   |  DAI Link               |    |
+|   +-------------------------+    |
+|                                  |
+|           Soundcard              | 
++--------------------------------- +
+
+----
+
+=== Soundcard Contd.
+
+* Soundacard and components 
+
+----
+
+sound_card 
+  +--> dai_link
+            +---> codec (dai_link_component)
+                  +---> dai_name from codec driver.
+            +---> cpu_dai
+                  +---> cpu_dai_name from soc DAI driver.  
+            +---> snd_soc_ops
+  +--> control
+
+----
+
+
+== Alsa Machine Driver Snippet
+
+=== DAI Link Component 
+
+* Create DAI link component which has the driver name of the codec
+  chip driver.
+
+* if we have two codecs for each channel we can create array of
+  dai_link_component.
+
+----
+
+static struct snd_soc_dai_link_component my_codecs[] = {
+        {
+		.dai_name = "pcm512x-hifi", /* Name from Codec driver of the chip used */
+	},
+	{
+		.dai_name = "pcm512x-hifi",
+	},
+};
+
+----
+
+=== DAI Link 
+
+* Create DAI link which links the codec and the DAI.
+
+------
+/* machine stream operations */
+static struct snd_soc_ops snd_my_ops = {
+	.hw_params = snd_my_hw_params,
+};
+
+static struct snd_soc_dai_link snd_my_dai[] = {
+       {
+       	.name		= "Mydai",
+	.stream_name	= "Mydai",
+	.cpu_dai_name	= "bcm2708-i2s.0", /* name from the dai driver of the SOC used */
+	.platform_name	= "bcm2708-i2s.0",
+	.codecs		= my_codecs,
+	.num_codecs	= 2,
+	.dai_fmt = SND_SOC_DAIFMT_I2S | /* Type I2S */
+		 SND_SOC_DAIFMT_NB_NF | /* Normal Bit Clock and Frame Sync*/ 
+		 SND_SOC_DAIFMT_CBS_CFS, /* Codec is Clk & Sync Slave */
+	.ops  = &snd_my_ops,
+	.init  = my_init,
+	},
+};
+----
+
+=== Control Interface
+
+* Create the sound controls as with text options to be listed in the
+  UI application.
+
+* Develop callbacks to get and set the control value.
+
+----
+/* Control Interface */
+static const char * const mode_texts[] = {
+	"2.0",
+	"2.1",
+	"2.2",
+};
+
+static const SOC_ENUM_SINGLE_DECL(mode_enum,
+	      0, 0, mode_texts);
+
+static const struct snd_kcontrol_new my_controls[] = {
+	SOC_ENUM_EXT("Subwoofer mode",
+				mode_enum,
+				mode_get,
+				mode_put),
+};
+----
+
+=== Sound Card
+
+* Create the soundcard  with dai link and the control already created.
+
+* Registers the new sound card to ALSA subsystem.
+
+----
+/* audio machine driver */
+static struct snd_soc_card snd_mycard = {
+	.name = "Mycard",
+	.owner = THIS_MODULE,
+	.dai_link = snd_my_dai,
+	.num_links = ARRAY_SIZE(snd_my_dai),
+	.controls = my_controls,
+	.num_controls = ARRAY_SIZE(my_controls),
+};
+
+
+module_init()
+{
+	snd_soc_register_card(&snd_mycard);
+}
+----
+
+=== References
+
+* http://thewelltemperedcomputer.com/Linux/AudioArchitecture.htm
+* http://www.volkerschatz.com/noise/alsa.html
+* http://equalarea.com/paul/alsa-audio.html
+* http://users.suse.com/~mana/alsa090_howto.html
+* http://www.linuxjournal.com/node/6735/print
+* http://free-electrons.com/doc/embedded_linux_audio.pdf
+* http://processors.wiki.ti.com/index.php/AM335x_Audio_Driver's_Guide
+* https://01.org/linuxgraphics/gfx-docs/drm/sound/index.html
+* http://processors.wiki.ti.com/index.php/Sitara_Linux_Audio_Driver_Overview
+
+== Backup Slides
+
+=== Alsa Operations
+
+* PCM Capture
+
+* PCM Playback
+
+* Sound Control
+
+=== Audio Parameters
+
+* Sampling Frequency / Bitrate
+
+* Channels
+  - Mono
+  - Stereo
+  - Multi
+
+* Sound Format
+  - Unsigned Little/Big Endian
+  - Signed   Littel/Big Endian
+
+* DAI Format
+  - NB_NF
+  - CBS_CFS
