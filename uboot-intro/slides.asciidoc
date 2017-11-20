@@ -1,0 +1,136 @@
+= Getting Started with U-Boot
+
+== U-Boot a Boot Loader
+ 
+=== Introduction
+
+  * U-Boot is an open source boot-loader, that supports varied processor
+    architectures, different SoC families and numerous boards.
+
+  * It initializes the clock, memory and peripheral devices required
+    for booting OS.
+
+  * U-Boot is a Linux aware boot-loader, which know how boot strap the
+    Linux kernel.
+
+  * U-Boot is primarily a boot loader, but it also used for board
+    bring-up and production testing.
+
+=== U-Boot and Linux
+
+  * U-Boot is a single threaded firmware program, which bootstraps
+    Linux kernel and perishes from RAM after that.
+
+  * U-Boot most commonly runs with interrupts disabled and drivers are
+    developed with polling support.
+
+  * U-Boot tries stay close to the Linux kernel development and adopts
+    lot of changes from the kernel.
+
+  * U-Boot source hierarchy, driver model and flash filesystems
+    support are similar to Linux.
+
+=== Getting U-Boot
+
+  * Before Oct 2008, U-boot had a x.y.z release numbering convention.
+
+  * Releases now have time-stamp based release numbering yyyy.mm,
+    development releases are numbered yyyy.mm-rcN.
+
+  * U-Boot can be obtained from ftp://ftp.denx.de/pub/u-boot/
+
+=== U-Boot Command Interface
+
+  * When U-boot boots up, before passing control to the kernel,
+    displays
+
+------
+Hit any key to stop autoboot:  3
+------
+
+  * Command interface can be accessed by pressing a key at this point.
+
+  * Several commands are available in the U-boot prompt. Type `help`
+    to get the list of commands. The commands available can be
+    configured during compile time.
+
+  * The command to boot the kernel is `boot`.
+
+----
+U-boot> boot
+----
+
+=== Environment Variables
+
+  * U-boot has a set of variables that affects the behaviour of
+    U-boot. These variables are stored in Flash memory and are called
+    U-boot environment variables.
+
+  * To see the list of variables use the `printenv` command.
+
+------
+U-boot> printenv
+bootdelay=3
+baudrate=115200
+ethact=macb0
+ethaddr=00:11:22:33:44:55
+bootargs=console=ttyS0,115200 root=/dev/ram0
+bootcmd=bootm 0xD0042000
+stdin=serial
+stdout=serial
+stderr=serial
+------
+
+=== Modifying Variables
+
+   * To change the value of a variable, the `setenv` command can be
+     used.
+
+------
+U-boot> setenv variable value
+------
+
+   * Values changed are stored in memory and are lost after, a
+     reboot. To save the modified variables the `saveenv` command can
+     be used.
+
+------
+U-boot> saveenv
+Saving Environment to dataflash...
+------
+
+=== Configuration U-Boot
+
+  * Since U-boot supports multiple boards, the exact board for which
+    U-boot is to be built has to be specified.
+
+  * Make is invoked as shown below. Where `xyz` is to be replaced by
+    the board name.
+
+------
+$ make xyz_config
+------
+
+  * The list of available boards can be found by looking at
+    `include/configs/`, which contains one header file for each
+    supported board.
+
+=== Building U-Boot
+
+  * U-boot can be built using
+
+------
+$ make all
+------
+
+  * To cross-compile U-boot, the cross-compiler prefix should be
+    specified, through the `CROSS_COMPILE` environment variable.
+
+------
+$ make all CROSS_COMPILE=arm-none-eabi-
+------
+
+  * As a result of the compilation process `u-boot.bin` will be
+    produced.
+
+  * Which can be flashed to the target board.
