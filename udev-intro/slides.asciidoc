@@ -1,0 +1,112 @@
+= Udev for Device Management in Linux
+by Deepak Soundararajan <deepak@zilogic.com> 
+
+== Drivers and Memory
+
+=== Drivers
+
+
+* kernel uses different drivers to access different devices.
+[role="bottom"]
+image::figures/kernel-drivers.png[width=800,align="center"]
+
+=== Memory
+
+* Both kernel and drivers has to reside in the RAM for accessing the
+  required devices.
+
+image::figures/kernel-drivers-ram.png[width=800,align="center"]
+
+=== Drivers Usage
+
+* But not all the drivers used at all the time. 
+
+* Ex: usb mass storage driver for accessing pendrive, but it is
+  required only when pendrive is plugged in to system.
+
+* It is enough that we load the driver when it is required, so that
+  RAM can be used for applications.
+
+=== Ideal Split
+
+* RAM is precious, which would be low in size in a system.
+
+* Harddisk usually has large storage capacity 
+
+* Have the drivers in Harddisk, and load them to RAM dynamically when
+  required.
+
+=== Ideal Split (2)
+
+image::figures/kernel-drivers-ram-hdd.png[width=800,align="center"]
+
+=== Module Loading
+
+* Kernel has facility to load the drivers from harddisk to the
+  kernel's memory.
+
+* This can be done from userspace using commands like `insmod` and
+  `modprobe`.
+
+== Autoloading
+
+=== On-demand Module Loading
+
+* We may want these driver loading to be happening on-demand,
+  automatically.
+
+* whenever a device is plugged the driver has to load immediately and
+  automatically.
+
+=== Hotplug
+
+* Kernel detects the hotplugabble devices like usb devices
+
+* Assigns them a unique id.
+
+* sends userspace a message of the device identified.
+
+[role="split-column"]
+=== UDev
+
+[role="left"]
+* This is a userspace daemon which runs in backgroud.
+
+* Listens for these messages from the kernel
+
+* Loads the required driver matching the id, sent my kernel.
+
+[role="right"]
+image::figures/autoload.png[width="600", align="center"]
+
+=== Modalias
+
+* The drivers would have list of device ids which it supports,
+  embedded into them.
+
+* This unique ids is the string which is combination of vendorid,
+  productid, class of the device, its serial number etc.
+
+* It is called as modalias.
+
+* UDev uses this modalias to match and find the appropriate driver.
+
+=== UDev Features
+
+* UDev supports module autoloading
+
+* Providing persistent device nodes across boot.
+
+* Creation of symlinks
+
+* Uses udev rules to manage the devices.
+
+* Any actions can be added as scripts and invoked through a rule
+
+* Ex: when a pendrive plugged we want to open the file explorer.
+
+=== UDev Roles
+
+image::figures/udev-uevent.png[width=700,align="center"]
+
+=== Questions
