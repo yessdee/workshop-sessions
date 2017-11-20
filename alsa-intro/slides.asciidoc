@@ -1,0 +1,51 @@
+= Linux Audio
+
+=== Audio Introduction
+
+* Sound - Longitudinal Wave 
+* Digitization 
+* Quantization
+
+==== Audio Capture
+==== Audio Playback
+==== Audio Parameters
+ 
+=== Linux Audio Frameworks
+
+* Architecture
+
+* Sound Drivers
+  - OSS
+  - ALSA
+* Sound Servers
+  - Pulse
+  - Jack
+* Media Frameworks
+  - Gstreamer
+  - Xine
+  - VLC
+  - Photon
+
+=== ALSA Introduction
+
+* Capture
+* Control
+* Mixer
+
+=== ALSA Params
+
+* HW
+* Frame, Period & Buffer    
+* SW
+
+=== ALSA APIs
+==== ALSA Capture
+==== ALSA Playback
+==== ALSA Control
+==== ALSA Async
+
+=== References
+
+* http://www.linuxjournal.com/article/6735
+* http://soundprogramming.net/programming/alsa-tutorial-1-initialization/
+* http://nairobi-embedded.org/alsa_audio_daq.html
