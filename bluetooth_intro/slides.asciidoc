@@ -1,0 +1,331 @@
+= Introduction to Bluetooth
+
+== Standards
+
+=== WPAN Standards
+
+* 802.15 - Wireless Personal Area Network
+
+* 802.15.1 - Bluetooth
+
+* 802.15.4 - Low Rate WPAN(Zigbee, 6LoWPAN, Thread)	
+
+=== RF
+
+* ISM Band - 2.402 to 2.483/85GHZ
+
+* 79 Channels of width 1 MHz
+
+=== Spread Spectrum and Modulation 
+ 
+* Uses Adaptive Frequency Hopping Spread Spectrum with 800 hops / sec
+
+* Basic Rate(BR) - 1 Mbps with GFSK
+
+* Enhanced Data Rate (EDR) - 2 Mbps with Pi/4-DPSK and 3 Mbits with
+  8DPSK
+
+* High Speed (HS) - 24 Mbps with 802.11 as Alternate MAC / PHY
+
+=== Architecture
+
+* Master / slave model
+
+* Data transfer relies on master's clock.
+
+* Packet based protocol
+
+=== Topology
+
+* Piconet - 1 Master with Max 7 Slaves
+
+* Scatternet - Multiple Piconet Join to form it.
+
+=== Versions
+
+* 1.0 
+  - BR
+
+* 2.0 
+  - EDR
+
+* 3.0
+  - HS
+
+* 4.0
+  - Bluetooth Smart Ready (Classic)
+  - Bluetooth Smart / Bluetooth Low Energy - Sensors
+
+* 5
+  - Slot Availability Masking (SAM)
+
+* Reference -
+  https://www.rtings.com/headphones/learn/what-is-bluetooth
+
+=== BT Power Classes
+
+* Class1
+  - 100mW, 100 meters, 328 feet
+
+* Class2
+  - 2.5mW, 10 meters, 33 feet
+
+* Class3  
+  - 1mW, less than 10 meters 
+
+=== Profiles
+
+* Allows usage of Bluetooth for specific application in predefined
+  protocol.
+
+* Funtional modes with defined parameters and data flow.
+
+=== Profile Class
+
+* Telephony Control
+  - Hands Free Profile(HFP), Head Set Profile(HSP) 
+
+* Audio
+  - Advanced Audio Distribution Profile (A2DP) , Audio Video Remote Control Profile (AVRCP)
+
+* Object Exchange
+  - Transfer Types - GOEP, Push, FTP, PBAP, MAP
+  - Object Types - vCard, vCalendar, vMessage, vNotes
+
+* Network
+  - BNEP, DUN, WAP
+
+* Devices
+  - HID
+
+=== Bluetooth Classic Stack
+
+  +---------------+        
+  | L2CAP         |   Host or PC 
+  +---------------+        
+  | HCI           |   UART / USB / SDIO / SPI
+ -+---------------+---------------------------
+  | HCI           | \ UART / USB / SDIO / SPI
+  +---------------+  \
+  | Link Manager  |   \ 
+  +---------------+    |   Bluetooth
+  | Link Control  |    |   Hardware Module
+  +---------------+   /
+  | RF            |  /
+  +---------------+ /
+
+=== Bluetooth Stack
+
+* RF
+  - PHY layer manages spread spectrum and modulation
+
+* Link Control
+  - Handles connection management 
+
+* Link Manager
+  - Configuring connection as ACL/SCO
+
+* HCI
+  - Standard CMD/Packet Interface for host to communicate with HW.
+
+* L2CAP
+  - Packet Segmentation and Reassembly (SAR)
+
+=== Opensource Bluetooth Stacks
+
+* Bluez in Linux
+
+* Bluedroid in Android
+
+* lwBT for Embedded Firmwares
+
+=== Bluetooth Services files
+
+----
+  +------+   +---------+ +--------+ 
+  | SDP  |   | OBEX    | |  SPP   |
+  +------+   +---------+ +--------+        
+
+	     +--------------------+        
+  	     |      RFCOMM        |
+  	     +--------------------+        
+
+  +-------------------------------+        
+  |      L2CAP                    |
+  +-------------------------------+        
+----
+
+=== Bluetooth Audio Profiles
+
+----
+  +------+   +---------+ +--------+  +--------+
+  | A2DP |   | HSP     | |  HFP   |  | AVRCP  |
+  +------+   +---------+ +--------+  +--------+      
+ 
+  +------+   +--------------------+  +--------+      
+  | AVDTP|   |      RFCOMM        |  |  AVCTP |
+  +------+   +--------------------+  +--------+      
+
+  +-------------------------------------------+        
+  |                 L2CAP                     |
+  +-------------------------------------------+        
+----
+
+=== Bluetooth NW Profiles
+
+----
+  +------+   +---------+ +--------+
+  |TCP/IP|   | OBEX    | |  DUN   |
+  +------+   +---------+ +--------+        
+ 
+  +------+   +--------------------+        
+  | BNEP |   |      RFCOMM        |
+  +------+   +--------------------+        
+
+  +-------------------------------+        
+  |      L2CAP                    |
+  +-------------------------------+        
+----
+
+=== A2DP & AVRCP
+
+* Playing audio BT Speakers / Headphones
+
+* Audio Codecs used for compression.
+
+  - SBC 345kbps@48KHz - Low Quality
+  - AAC 728kbps       - Mid Quality
+  - aptX (Qualcomm)   - High Quality
+  - LDAC (Sony)       - High Quality
+
+* Operations in AVRCP
+  - Volume control, Play, Pause, Rewind, Mute.
+
+=== Hands Free / Head Set Profile
+
+* Allows the mobile phone to use BT based external speaker and mic for
+  phone call.
+
+* Voice Codecs used for compression / companding
+
+  - CVSD / PCM
+  - a-law / ulaw
+  - mSBC
+
+* Operations
+  - HFP + HSP - Call, Ring, Answer, Hungup
+  - HFP - Redial, Call Waiting, Signal Status
+
+=== Obex File Transfer Profile
+
+* Object Push (OPP)
+  - allows to transfer a file.
+
+* File Transfer Protocol (FTP)
+  - allows to transfer, receive, change directory, list the remote
+    files
+
+=== Obex Mobile Profiles
+
+* Message Access Profile (MAP)
+  - To get SMS, Calender, Notes & Email from a mobile.
+  - To get Received, Sent, Draft Messages
+  - Gives in XML / VCF format
+
+* Phone Book Access (PBAP)
+  - To get vCard from a mobile
+  - To get complete contacts list
+  - To get incoming, outgoing, missed and combined call list.  
+
+=== Base Profiles
+
+* Session Description Profile(SDP)
+  - Allows to get services supported by the remote bluetooth devices.
+
+* Serial Port Profile
+  - It is a wireless serial communication
+  - Allows to emulate serial port over BT
+  - Uses RFCOMM Layer of BT stack. 
+
+== Bluetooth on Linux
+
+=== Bluez Stack
+
+-----
+  +---------------------------+
+  |      Bluetooth Tools      |
+  +---------------------------+
+       |              | 
+       | (DBUS)       |
+  +------------+      |
+  | Bluetoothd |      |
+  +------------+      |
+        |             | (AF_Bluetooth Socket)  
+        |             |                 User-space
+  - -------------------------------------------------
+                                        Kernel-space
+  +---------------------------+
+  |  +---+-------+            |  
+  |  |   |RFCOMM|            |
+  |  |   +-------+  +-----+   |
+  |  |  L2CAP    |  | SCO |   |
+  |  +-----------+  +-----+   |
+  |  +--------------------+   |
+  |  |         HCI        |   |
+  |  +--------------------+   |
+  |                           |
+  |       Bluez in Kernel     |
+  +---------------------------+
+----
+
+=== Bluez Configuration Tools
+
+* bluetoothd - Daemon to enable BT controller attached to host
+
+* bluetoothctl - Command line interface to pair and connect BT device
+
+* hciconfig - Configure bluetooth devices
+
+* hcitool - Configures bluetooth connections
+
+* sdptool - Discover what are all the services available for bluetooth
+  device
+
+* rfcomm - Allows to setup rfcomm configuration, for remote serial
+  communication.
+
+* rfkill - to enable and disable wireless devices
+
+=== BT File Transfer Tools
+
+* obexd - Daemon to exchange object between BT paired devices
+
+* obexftp - Able to access files on mobile and able to transfer files
+  to PC via bluetooth
+
+=== BT Phone Sync Tools
+
+* nOBEX library - Can access message(MAP) and phone book(PBAP) on
+  mobile
+
+=== BT Audio Tools 
+
+* Pulseaudio
+
+  - Linux Audio Server, to play audio files in Linux. 
+
+* pulseaudio-module-bluetooth 
+
+  - Plugin, which enables pulseaudio to work with bluetooth devices
+
+  - Helps to stream audio from one BT device(mobile) to another BT
+    BT (BT headset)
+
+  - Required for A2DP, HSP and HFP 
+
+=== BT Telephony Tools
+
+* ofono 
+  - Mobile Telephony application
+
+  - For BT it supports HFP and HSP communication with mobile phones
