@@ -1,0 +1,289 @@
+= Introduction to ALSA
+
+== ALSA For Linux Audio
+
+=== History of Linux Audio
+
+* Open Sound System(OSS) is originally the first Linux audio layer.
+
+* It could support only few devices and single instance of playback.
+
+* Then it started that the need for audio layer which tries to support
+  several parallel playbacks.
+
+* Scaleability of the audio framework several growing features and
+  devices.
+
+=== Need for ALSA
+
+* Audio capture and playback needs to access multilple types of access
+
+* Need for easier abstration over different types of Audio devices
+
+* Need to support deterministic timing requirements to play quality
+  audio.
+
+=== Features of ALSA
+
+* Supports audio capture, playback and full duplex operation.
+
+* Provides mono to multi channel Audio support.
+
+* Supports different PCM audio types and bitrates
+
+* Extend the capability of ALSA with addition of plugins.
+
+=== Components and Layers of ALSA 
+
+----
+   +-----------+--------+
+   +  ALSA App | App    |
+   +-----------+--------+
+
+   +--------------------+
+   |       ALSA API     |
+   +-------------+      |
+   |   Plugins   |      |
+   +--------------------+
+   | ALSA Drv/HW Access |
+   +--------------------+         User Space
+
+   /dev/snd/{pcm/timer/control}
+---------------------------------------------->
+                                  kernel Space
+   +--------------------+
+   |     ALSA Core      |
+   +--------------------+
+
+   +----------+ +--------+
+   | Audio    | |  Audio | 
+   |Interface | | Codec  |
+   | Driver   | | Driver |
+   +----------+ +--------+
+       
+-----------------------------------------------
+                                   Hardware
+   +----------+ +--------+
+   | Audio    | | Audio  |
+   | Hardware | | Codec  |
+   +----------+ +--------+
+----
+
+=== Types of ALSA Drivers
+
+* PCM drivers and APIs for capture and playback of PCM samples
+
+* Control drivers and APIs for audio control and simple mixing
+
+* Sequence and Timer drivers for MIDI audio handling
+
+
+----
+
++---------+ +--------+    +-------------------------+  +-----------+
+| Control | | PCM    |    |  MIDI                   |  | Sequencer |
+|  Mixer  | |        |    |                         |  |           |
+|  App    | | Apps   |    |  Apps                   |  |   Apps    |
++---------+ +--------+    +-------------------------+  +-----------+
+
++---------+ +--------+    +----------+                 +-----------+
+|   |Mixer| | |Plugin|    |          |                 |           |
+|   +-----+ | +------+    |          |                 |           |
+|         | |        |    |          |                 |           |
+| Control | |  PCM   |    | Raw MIDI |                 | Sequencer |
+|  APIs   | |  APIs  |    |  APIs    |                 |   APIs    |
++---------+ +--------+    +----------+                 +-----------+
+---------------------------------------------------------------------
++---------+ +--------+    +----------+  +-----------+  +-----------+ 
+| Control | |   PCM  |    | Raw Midi |  |  VirMIDI  |  | Sequencer |
++---------+ +--------+    |          |  +-----------+  |    Core   |
+                          |          |  +-----------+  +-----------+
+                          |          |  | Seq MIDI  |  +-----------+
+	    		  +----------+  +-----------+  |   Timer   |
+                                                       +-----------+
+
+----
+
+== Using ALSA
+
+=== Getting ALSA Working
+
+* Need to load the ALSA core drivers and the card drivers as snd*
+
+----
+$ lsmod | grep snd
+----
+
+* Need to have the alsa library files like alsa-lib/libasound*.so
+
+----
+$ find /usr/lib -name "*sound*.so*"
+----
+
+* Need to have alsa cards detected and their device nodes in
+  /dev/snd/*
+
+----
+$ ls /dev/snd/*
+----
+
+=== Configuring ALSA
+
+* The system configuration file is /etc/asound.conf, and the per-user
+  configuration file is ~/.asoundrc
+
+* Supports key value assignment to configure the ALSA framework in
+  several ways.
+
+* it takes integer and and string datatypes.
+
+=== Assignment Syntax
+----
+
+key value
+key = value
+key.subkey0 = value
+key {             # Compund Initialization
+	subkey0 value0;
+	subkey1 value1;
+    }
+key.0 = value0
+key [ value0      # Array Type Initialization
+      value1
+    ]
+----
+
+=== Nesting Syntax
+
+* Compound configuration is used for Nesting the configuration
+----
+
+master {
+       type <plugin>
+       slave {
+       }
+}
+
+----
+ 
+=== Playing Around ALSA
+
+== ALSA Plugins
+
+=== Plugins 
+
+* Allows extending the capability of ALSA.
+
+* They are the filters which are placed in data path between the
+  application and the device.
+
+-----
+
+  +--------+      +----------+        +-----------+
+  |  Apps  |<---->|  Plugins |<------>|  Hardware |
+  +--------+      +----------+        +-----------+
+
+-----
+
+
+=== Master Slave Chain
+
+----
+ +-------------+    +---------+    +---------+
+ | Application |--->|  Master |--->|  Slave  |
+ +-------------+    +---------+    +---------+
+ 		     (Virtual      (Virtual/Real
+		       device)        Device)		   
+----
+
+=== Master Slave Chain Configuration
+
+----
+
+master {
+       slave {
+       }
+}
+
+----
+
+=== HW Plugin
+
+* This plugin allows application to directly access the hardware.
+
+* Just helps in giving meaning full alias names for the devices
+
+* Handles raw PCM and doesn't change anything to the PCM data. 
+
+* card `0` denotes  `hw:0,0` 
+
+=== HW Plugin Config
+
+----
+pcm.name {
+	 type hw
+	 card <number>	 
+}
+----
+
+----
+pcm.front {
+	type hw
+	card 0
+}
+----
+
+----
+$ aplay -D front test.wav 
+----
+
+=== Rate Plugin
+
+* This plugin allows to convert the bitrate of the PCM
+
+* Takes rate as a parameter to defined
+
+----
+pcm_slave.front {
+	    pcm "hw:0,0"
+	    rate 44100   
+} 
+
+pcm.rate_convert {
+	type rate
+	slave front	 
+}
+
+---- 
+ 
+=== Copy Plugin
+
+* 
+
+* 
+
+=== Plug Plugin
+
+* 
+
+* 
+
+=== Dmix Plugin
+
+=== Rate Plugin
+
+== References
+
+=== Links
+
+* https://www.alsa-project.org/alsa-doc/alsa-lib/pcm_plugins.html
+
+* https://01.org/linuxgraphics/gfx-docs/drm/sound/soc/index.html
+
+* https://www.alsa-project.org/~tiwai/lk2k/lk2k.html
+
+* http://www.penguinproducer.com/Blog/2011/12/history-and-clarification-of-linux-audio/
+
+* https://blog.linuxplumbersconf.org/2009/slides/Paul-Davis-lpc2009.pdf
+
+* https://pdfs.semanticscholar.org/presentation/0567/64499520e685333302f25128f5eed46cfbd6.pdf
