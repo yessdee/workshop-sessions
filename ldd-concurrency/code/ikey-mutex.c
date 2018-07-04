@@ -54,7 +54,6 @@ static irqreturn_t ikey_handler(int irq, void * dev)
 /* ### START: ikey-mutex.bh */
 static void ikey_bh(struct work_struct *work)
 {
-	int lk_sts = 0;
 	bool data_available = false;
 	while (1) {
 		bool ret;
@@ -64,7 +63,7 @@ static void ikey_bh(struct work_struct *work)
 		if (ret == false)
 			break;
 
-		lk_sts = mutex_lock_interruptible(&kf_lock);
+		mutex_lock(&kf_lock);
 		kfifo_put(&ikey_fifo, key);
 		mutex_unlock(&kf_lock);
 		data_available = true;

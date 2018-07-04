@@ -59,7 +59,6 @@
   * Concurrency due to *sleeping*, *pre-emption* and *interrupts*
     comes under pseudo-concurrency.
 
-
 == Descrepancies of Concurrency
 
 === Critical Region and Race Conditions
@@ -80,7 +79,7 @@ Race Condition::
 === No race, with luck
 
 `------------------`----------------------
-Thread A           Thread B
+Process A           Process B
 ------------------------------------------
 fetch i (7)        
 increment i (8)
@@ -93,7 +92,7 @@ writeback i (8)
 === SMP Race
 
 `------------------`----------------------
-Thread A           Thread B
+Process A           Process B
 ------------------------------------------
 fetch i (7)        fetch i (7)
 increment i (8)    increment i (8)
@@ -103,7 +102,7 @@ writeback i (8)    writeback i (8)
 === Pre-emption Race
 
 `------------------`----------------------
-Thread A           Thread B
+Process A           Process B
 ------------------------------------------
 fetch i (7)        
 increment i (8)    
@@ -115,7 +114,7 @@ writeback i (8)
 
 == Synchronization
 
-=== Solving Concurrency Issues
+=== Avoiding Concurrency Issues
 
   * Write callbacks as re-entrant codes
 
@@ -127,13 +126,13 @@ writeback i (8)
 
 === Mutual Exclusion
 
-* When one thread is accessing a shared data, other thread has to be
+* When one process is accessing a shared data, other process has to be
   excluded from accesing the shared data.
 
 * This is achieved by locking mechanism,
   - who ever accesses the shared data, checks and acquires a lock,
 
-  - other thread if finds lock acquired by other waits until the lock
+  - other process if finds lock acquired by other waits until the lock
     is released.
 
 === Lock Scenarios
@@ -163,7 +162,7 @@ writeback i (8)
 === Locking with Mutex (SMP case)
 
 `------------------`----------------------
-Thread A           Thread B
+Process A Context   Process B Context
 ------------------------------------------
 mutex_lock	   mutex_lock sleeps
 fetch i (7)            -
@@ -181,7 +180,7 @@ mutex_unlock
 === Locking with Mutex (Pre-emption case)
 
 `------------------`----------------------
-Thread A           Thread B
+Process A Context   Process B Context
 ------------------------------------------
 mutex_lock
 fetch i (7)        
@@ -225,6 +224,15 @@ void mutex_lock(struct mutex *lock);
 void mutex_unlock(struct mutex *lock);
 ------
 
+=== When a Race Condition Occur in Driver
+
+* if bottom halves and interrupt handler accessing same shared data
+
+* if two character driver callbacks accessing the same shared data.
+
+* if two processess or threads accesses the same driver
+  simultaneously.
+
 === I2C Key Headers
 
 [source,c]
@@ -263,7 +271,7 @@ include::code/ikey-mutex/ikey-mutex.read[]
 
 === Advantages of Spinlocks
 
-  * Can be used to protect a shared data between process contexts.
+  * Can be used to protect a shared data between interrupt contexts.
 
   * Can also be used to protect a shared data between 
     - process context and interrupt context 
@@ -304,7 +312,7 @@ void spin_lock(spinlock_t *lock);
 void spin_unlock(spinlock_t *lock);
 ------
 
-=== Spinlocks with Interrupts
+=== Spinlocks with Interrupts Disabled
 
   * Acquiring the lock and disabling interrupts.
 
@@ -360,7 +368,7 @@ image::figures/choose-lock.png["Choosing a Locking Scheme",width=1024,align="cen
 === Deadlocking by sleeping
 
 `------------------`----------------------
-Thread A           Thread B
+Context A           Context B
 ------------------------------------------
 spin_lock_irq	   -
 sleep		   spin_lock_irq busy loops
@@ -372,7 +380,7 @@ XX Dead Lock XX
 
 .Deadly Embrace, ABBA Deadlock
 `------------------`----------------------
-Thread A           Thread B
+Context A           Context B
 ------------------------------------------
 lock A		   lock B
 lock B Sleep	   lock A Sleep
@@ -385,7 +393,7 @@ XX Dead Lock XX	   XX Dead Lock XX
 
 .Double Acquire
 `------------------`----------------------
-Thread A           Thread B
+Context A          Context B
 ------------------------------------------
 lock A		   lock B
 Func()	   	   lock A Sleep
