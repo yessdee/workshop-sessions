@@ -332,6 +332,63 @@ include::code/key-debounce.py[]
 == Backup Slides
 
 [role="two-column"]
+=== Introduction
+
+[role="left"]
+
+ * *General Purpose Input Output(GPIO)* are single pin IO, represents
+   voltage signal as binary logic level `high` and `low`.
+
+ * Typically GPIO `high` maps to voltage closer to VCC and `low` maps
+   to voltage closer to ground.
+
+ * `high` state is considered as logical `1` and low as `0`.
+
+[role="right"]
+image::figures/gpio-bistate.png[]
+
+=== Key Debounce
+
+* The switches or keys used are mechanical devices and when key is
+  pressed or depressed they tend to vibrate creating noises until it
+  settles down.
+
+* This condition can be handled in hardware by adding a debounce
+  filter.
+
+* It can also be handled in software by waiting for specific time from
+  the event occurence till it settles down.
+
+* This delay time is typically around few hundred millisecond and
+  called debounce delay.
+
+=== Programming for Keys
+
+[source,python]
+----
+include::code/key.py[]
+----
+
+=== Key Polling
+
+* Since the key press is asynchronous, it has to be polled
+  continuously or periodically.
+
+* Continuously polling for key may burn the CPU, instead periodical
+  polling should be sufficient for keys.
+
+* Typical key stroke period by humans, couldn't be less than few
+  hundred millisecs.
+
+* it's enough that we can poll for key press once in 100 msec. 
+
+=== Try Out Code
+
+* The code for the tryout is 
+  link:{include:code/key-status.py.datauri}["key-status.py",filename="key-status.py"]
+
+
+[role="two-column"]
 === Seven Seg
 
 [role="left"]
@@ -373,41 +430,6 @@ include::code/sseg.py[]
 * This done using Bitbanging is a technique, which allows to simulate
   serial busses using software over GPIO.
 
-=== Key Debounce
-
-* The switches or keys used are mechanical devices and when key is
-  pressed or depressed they tend to vibrate creating noises until it
-  settles down.
-
-* This condition can be handled in hardware by adding a debounce
-  filter.
-
-* It can also be handled in software by waiting for specific time from
-  the event occurence till it settles down.
-
-* This delay time is typically around few hundred millisecond and
-  called debounce delay.
-
-=== Programming for Keys
-
-[source,python]
-----
-include::code/key.py[]
-----
-
-=== Key Polling
-
-* Since the key press is asynchronous, it has to be polled
-  continuously or periodically.
-
-* Continuously polling for key may burn the CPU, instead periodical
-  polling should be sufficient for keys.
-
-* Typical key stroke period by humans, couldn't be less than few
-  hundred millisecs.
-
-* it's enough that we can poll for key press once in 100 msec. 
-
 === Sensors and Actuators
 
  * Sensors - produces two values 'on' or 'off'
@@ -419,25 +441,5 @@ include::code/key.py[]
    - Relays: Turn ON / OFF Appliances
    - Solenoids
 
-[role="two-column"]
-=== Introduction
-
-[role="left"]
-
- * *General Purpose Input Output(GPIO)* are single pin IO, represents
-   voltage signal as binary logic level `high` and `low`.
-
- * Typically GPIO `high` maps to voltage closer to VCC and `low` maps
-   to voltage closer to ground.
-
- * `high` state is considered as logical `1` and low as `0`.
-
-[role="right"]
-image::figures/gpio-bistate.png[]
-
-=== Try Out Code
-
-* The code for the tryout is 
-  link:{include:code/key-status.py.datauri}["key-status.py",filename="key-status.py"]
 
 
