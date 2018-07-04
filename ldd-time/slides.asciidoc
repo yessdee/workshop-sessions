@@ -88,7 +88,7 @@ include::code/led-blink-delay/led-blink-delay.exit[]
 
 === Flow of Time
 
-  * The kernel keeps track flow of time, 
+  * The kernel keeps track of flow of time, 
     - for scheduling, 
     - maintain CPU usage time of a process, 
     - to perform periodic and timely actions.
@@ -103,7 +103,8 @@ include::code/led-blink-delay/led-blink-delay.exit[]
 === HearBeat of the Kernel
 
   * The global counter variable is called `jiffies`. It contains the
-    no. of interrupts or ticks that have occurred since boot-up. 
+    no. of systimer interrupts or ticks that have occurred since
+    boot-up.
   
   * The variable is declared in `linux/jiffies.h`
 
@@ -141,6 +142,7 @@ cat /proc/timer_list
 For every 1 second, we can watch it by
 
 [source,sh]
+
 ----
 watch -n1 'grep jiffies: /proc/timer_list'
 ----
