@@ -382,7 +382,7 @@ include::code/ikey/ikey/handler[]
 === Try Out
 
   * Get the `key` module:
-    link:{include:cdist/key.tar.gz.datauri}["key.tar.gz",filename="key.tar.gz"]
+    link:{include:cdist/ikey.tar.gz.datauri}["ikey.tar.gz",filename="ikey.tar.gz"]
 
   * Load the module, and create device nodes
 
