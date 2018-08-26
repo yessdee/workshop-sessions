@@ -1,0 +1,402 @@
+= Introduction to Automotive and CAN
+
+== Preface
+
+=== Prologue
+
+* This document is more an automotive jargon buster.
+
+* Represents terms to be known for working at automotive
+
+* Expected that audience go through the terms and get the details by
+  their own.
+
+* Certain representational links are also added, to narrow down the
+  audience to focus on the key areas.
+
+== Automotive 
+
+=== Automotive Basic Devices
+
+* Electronic Control Unit (ECU)
+
+* Electronic Instrument Cluster
+
+=== Automotive Devices
+
+* Automotive Head Units (AHU) 
+
+* In-Vehcile Infotainment (IVI)
+
+* Telematics Control Unit (TCU)
+
+* Advanced Driver Assistance System (ADAS)
+  - Heads-Up Display (HUD)
+
+=== Automotive Features for Future
+
+* Autonomous Driving
+
+* Vehicle to Vehicle (V2V)/ Vehicle to Roadside (V2R) / (V2X)
+
+=== Electroni Control Unit (ECU)
+
+ * Engine Control Module (ECM)
+
+ * Powertrain Control Module (PCM)
+
+ * Brake Control Module (BCM)
+
+ * Tranmission Control Unit (TCU)
+
+ * Suspension Control Module (SCM)
+
+ * Anti-lock Braking System (ABS)
+
+ * Electronic Power Steering (EPS) 
+
+ * Body Control Modules (BCM)
+
+=== Instrument Cluster
+
+* Dashboard Types
+  - Digital & Analogue Gauges 
+
+* Speedometer, Tachometer and Odometer
+
+* Fuel Gauge
+
+* Telltales (Indicators)
+  - turn
+  - seatbelt warning
+  - engine malfunction
+  
+=== Automotive Devices Reference
+
+* Cluster
+
+  - https://www.edn.com/design/automotive/4437780/The-basics-of-automotive-cluster-device-architectures-and-applications-part-I
+
+  - https://www.continental-automotive.com/getattachment/4aeb2376-1dea-4cd2-956d-7da5f5d71c2a/Conti_VE_Platform-Cluster_Brochure_EN_single_2016_FINAL.pdf.pdf
+
+  - https://www.unece.org/fileadmin/DAM/trans/main/wp29/wp29wgs/wp29grsg/grsginf/81/grsg81_inf11.doc
+
+=== Automotive Devices Reference
+
+* Infotainment 
+
+  - https://elearning.renesas.com/pluginfile.php/355/mod_folder/content/0/DevCon_On-the-Road/DevCon_On-the-Road/Automotive/Infotainment_and_Telematics_Solutions_with_Renesas_R-Car.pdf?forcedownload=1
+  
+  - http://support7.qnx.com/download/download/26204/QNX_CAR_Architecture_Guide.pdf
+
+* Telematics
+
+  - http://www.ti.com/solution/telematics_control_unit?variantid=20402&subsystemid=21708
+
+  - https://www.slideshare.net/embitel1/what-is-telematics-control-unit-tcu
+
+  - https://www.fev.com/fileadmin/user_upload/DGE/Data_Sheets/DGE_TCU_Datasheet.pdf
+ 
+== CAN in Automotive
+  
+=== Usage Profiles in Automotive
+
+* Vehicle Communication interfaces between ECUs
+
+* Diagnostics Interfaces
+
+* Reprogramming Interfaces
+
+* Acquisition and Calibration Interfaces
+
+=== Contenders
+
+* LIN (Local Area Network)
+
+* K-Line (ISO 9141-2) - Deprecating
+
+* VAN (Vehicle Area Network)
+
+* References
+
+  - https://irjet.net/archives/V4/i7/IRJET-V4I7181.pdf
+
+  - http://www.ni.com/white-paper/9733/en/
+
+=== Architecture
+
+* Multi Master / slave model
+
+* Asynchronous Serial Communication
+
+* Bidirection and Half Duplex Communication
+
+* Link Layer protocol
+  - Frames are broadcasted and segregated based in ID field
+
+  - Flow control and Reliability through special frames 
+
+* Message based communication
+
+* Reference
+  - http://www.ti.com/lit/an/sloa101b/sloa101b.pdf
+
+=== Topology
+
+* Line / Bus Topology
+
+* Star Topology (CAN Splitter)
+
+* Ring Topology (Less used)
+
+* Reference
+  - http://www.mindsensors.com/content/86-can-and-its-topology
+
+  - https://people.kth.se/~kallej/papers/can_necs_handbook05.pdf
+
+=== CAN Layers
+
+  +---------------+   
+  | CAN App       |
+  +---------------+ \      
+  | CAN Data Link |  |     
+  +---------------+  | 	   CAN      
+  | CAN PHY       |  |	   Hardware Module
+  +---------------+ /
+
+=== CAN Sub Layers 
+
+* Application Layer
+
+  - ECU Communication 
+  - Diagnostics Applications
+
+* Object Sub-layer
+
+  - Message filtering & Status handling
+
+* Transfer Sub-layer
+
+  - Handles bit timing, framing, arbitration, acknowledgement, error
+    detection and signalling.
+
+* Physical Layer
+
+  - Electrical representation of bits.
+
+=== Framing in Link Layer
+
+* Frame Types
+  - Data Frames
+  - Remote Data Frames
+  - Error Frame
+  - Overload Frame
+
+* Frame Fields
+  - Arbitration Fields
+    - Identifier + RTR
+  - Control Fields
+    - Reserved + DLC
+  - Data Fields
+  
+* References
+  - http://esd.cs.ucr.edu/webres/can20.pdf
+
+=== CAN Signalling & Encoding in Physical Layer
+
+* CAN High / CAN Low
+
+  - Differential Signals with resistor termination
+ 
+  - CANH 5V/3.5V and CAN Low 0V/1.5V   - Dominant  - BitValue 0
+
+  - CANH 2.5 V and CAN Low 2.5V        - Reccesive - BitValue 1 
+
+
+----
+
+  5.0V -----------------------------
+
+               D      R       
+  3.5V        ___ 
+             /   \   
+  2.5V  ____/     \______
+            \  0  /   1
+  1.5V       \___/   
+  
+ 
+ 0.0V -----------------------------
+
+----
+
+=== Variants Based on PHY
+
+* Speed
+  - High Speed - 40 Kbit/s to 1 Mbit/sec
+  - Low Speed  - 40 Kbit/s to 125 Kbits/sec
+
+* Power
+  - 5V Transceivers
+  - 3V Transceivers
+
+* Bus Termination
+  - 120 Ohms End Termination (High Speed)
+  - Per Device Termination   (Low Speed)
+
+=== Variants based ON Link Layer
+
+* Scalability
+  - 11 bit Message ID
+  - 29 bit Message ID
+
+* Frame Type
+  - Standard - 11 bit ID
+  - Extended - 29 bit ID
+  - Clasic   - 0 - 8 Byte Data 
+  - FD       - 0 - 64 Byte Data
+
+== CAN Standards and Variants
+
+=== History
+
+* Developed by Robert Bosch published to public as below standards.
+
+* CAN 2.0 A - 11 bit Message ID 
+
+* CAN 2.0 B - 29 bit Message ID
+
+* CAN FD 1.0 - 64 byte data (Flexible Datarate)  
+
+=== ISO  Standards
+
+* ISO 11898 for CAN
+
+* ISO 11898-1 - Data Link Layer 
+
+* ISO 11898-2 - Physical Layer High Speed 
+
+* ISO 11898-3 - Physical Layer Low Speed
+
+=== CAN Stack
+
+  +---------------+   
+  | CAN App       |
+  +---------------+   
+  | CAN Stack     |
+  +---------------+ \      
+  | CAN Data Link |  |     
+  +---------------+  | 	   CAN      
+  | CAN PHY       |  |	   Hardware Module
+  +---------------+ /
+
+=== Class of Stacks 
+
+* DoCAN UDS (ISO 15765-3) - Diagnostics
+
+* KWP2000 (ISO 14230)     - Diagnostics
+
+* UDS (ISO 14229)         - Diagnostics
+
+* ISO TP (ISO 15765-2)    - Network and Transport Layer for CAN
+
+* DoCAN OBD (ISO 15765-4) - External and Remote Diagnostics
+
+* SAE J1939               - Vehicle Network & Diagnostics (Diesel Engine Vehicles)
+
+* CCP & XCP               - CAN based Acquisition and Calibration
+
+* CANopen                 - Embedded Automation
+
+
+=== Protocol Stacks
+
+* References
+
+  - http://www.can-wiki.info/doku.php?id=can_higher_layer_protocols:main
+
+  - https://www.embitel.com/automotive-insights/library-of-ecu-communication-and-diagnostics-stacks-for-automotive
+
+  - https://www.embitel.com/blog/embedded-blog/kwp-2000-and-uds-protocols-for-vehicle-diagnostics-an-analysis-and-comparison
+  
+  - http://read.pudn.com/downloads168/doc/comm/774987/kp2000_2.pdf
+
+  - http://read.pudn.com/downloads118/ebook/500929/14230-2.pdf
+
+  - http://www.iosrjournals.org/iosr-jece/papers/Vol.%2010%20Issue%201/Version-1/D010112031.pdf
+
+  - http://www.can-wiki.info/doku.php?id=can_higher_layer_protocols:main
+
+  - https://automotive.softing.com/fileadmin/sof-files/pdf/de/ae/poster/UDS_Faltposter_softing2016.pdf
+  
+  - https://download.atlantis-press.com/article/25864359/pdf
+
+=== OnBoard Diagnostics
+
+  - emissions-related on-board diagnostics (OBD) as specified in ISO
+    15031,
+
+  - world-wide harmonized on-board diagnostics (WWH-OBD) as specified
+    in ISO 27145
+
+  - enhanced vehicle diagnostics (emissions-related system diagnostics
+    beyond legislated functionality, non-emissions-related system
+    diagnostics),
+
+  - end of life activation on on-board pyrotechnic devices(restraint
+    system) (ISO 26021)
+
+=== Generic CAN Stack for Diagnostics
+
+  +---------------+        
+  | UDS           |
+  +---------------+        
+  | DoCAN         |   
+ -+---------------+
+  | CAN ISO TP    |   
+  +---------------+   
+  | CAN ISO TP    |     
+  +---------------+ \      
+  | CAN Data Link |  |     
+  +---------------+  | 	   CAN      
+  | CAN PHY       |  |	   Hardware Module
+  +---------------+ /
+
+
+=== CAN Specific Tools
+
+* CAN Debuggers (Vector)
+  - CANanalayzer - One Node Simulation
+  - CANoe        - Multi Node Simulation
+  - CAPL         - Scripting Language
+  - CANape       - Calibration 
+
+
+=== Automotive Coding Tools
+
+* Static Analysis & Misra Compliance
+  - Coverity
+
+* Unit Testing
+  - Vectorcast
+
+* OS and Middleware
+  - Vector Autosar OS
+  - OSEK/VDX
+
+* JTAG Debugger
+  - Lauterbach
+
+=== Opensource CAN Stacks
+
+* SocketCAN in Linux 
+  - RAW, BCM, ISOTP & SAEJ1939
+
+* Opensource OBD-II platform with isotp and uds protocol
+  implementation
+
+* Reference 
+
+  - https://elinux.org/index.php?title=CAN_Bus
+  - https://elinux.org/Can-utils
+  - https://github.com/GENIVI/CANdevStudio
+  - https://github.com/openxc
