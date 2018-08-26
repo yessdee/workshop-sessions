@@ -49,7 +49,7 @@
    +--------------------+         User Space
 
    /dev/snd/{pcm/timer/control}
----------------------------------------------->
+ ---------------------------------------------->
                                   kernel Space
    +--------------------+
    |     ALSA Core      |
@@ -61,13 +61,14 @@
    | Driver   | | Driver |
    +----------+ +--------+
        
------------------------------------------------
+ -----------------------------------------------
                                    Hardware
    +----------+ +--------+
    | Audio    | | Audio  |
    | Hardware | | Codec  |
    +----------+ +--------+
 ----
+
 
 === Types of ALSA Drivers
 
@@ -93,7 +94,7 @@
 | Control | |  PCM   |    | Raw MIDI |                 | Sequencer |
 |  APIs   | |  APIs  |    |  APIs    |                 |   APIs    |
 +---------+ +--------+    +----------+                 +-----------+
----------------------------------------------------------------------
+ ---------------------------------------------------------------------
 +---------+ +--------+    +----------+  +-----------+  +-----------+ 
 | Control | |   PCM  |    | Raw Midi |  |  VirMIDI  |  | Sequencer |
 +---------+ +--------+    |          |  +-----------+  |    Core   |
@@ -127,6 +128,54 @@ $ find /usr/lib -name "*sound*.so*"
 $ ls /dev/snd/*
 ----
 
+=== ALSA Device Naming Conventions
+
+* ALSA generally classifies it devices with string name in format
+
+* Type: Card : Device: Subdevice
+
+* Type denotes whether it is hardware or virtual audio device
+
+* A single sound card can have multiple devices like analog and digital(SPDIF)
+
+* A devices can have multiple channels which is sub devices.
+
+
+=== ALSA Parameters
+
+* To play an audio the ALSA driver has to be configured with
+  parameters like channels, sample width, bitrate of audio.
+
+* Along with that for the seemless audio playback and capture, we may
+  need to handle data buffering between application and the device.
+
+* Application would have audio samples, but the data is sent to
+  devices by ALSA driver in a strict timer interval with help of timer
+  interrupt.
+
+* Application needs to prime the necessary data to the driver such
+  that, the data is available to the device at exact bitrate.
+
+* Again scheduling out of applications should not stop the audio
+  playback.
+
+=== ALSA Buffers
+
+* Driver allocates a ring buffer to which the application's audio
+  samples are pushed in.
+
+* Period is data set which is ready for the driver to play between two
+  interrupts.
+
+* Frames are the multi-channels samples that should be given to
+  device.
+
+* Sample is the PCM value for the single channel audio.
+
+=== ALSA Buffers Contd.
+
+image::figures/frames-periods.png[align="center"]
+
 === Configuring ALSA
 
 * The system configuration file is /etc/asound.conf, and the per-user
@@ -143,10 +192,11 @@ $ ls /dev/snd/*
 key value
 key = value
 key.subkey0 = value
-key {             # Compund Initialization
+key {             # Compound Initialization
 	subkey0 value0;
 	subkey1 value1;
     }
+
 key.0 = value0
 key [ value0      # Array Type Initialization
       value1
@@ -159,8 +209,10 @@ key [ value0      # Array Type Initialization
 ----
 
 master {
-       type <plugin>
        slave {
+       	     pcm {
+
+	     }
        }
 }
 
@@ -201,13 +253,58 @@ master {
 ----
 
 master {
+       type <plugin>
        slave {
+       	     pcm <hw>
        }
 }
 
 ----
 
-=== HW Plugin
+----
+slave {
+
+}
+
+master {
+	 slave <slave name>
+}
+----
+
+=== Master Slave Naming Convention
+
+* Master
+----
+pcm.<name> {
+}
+
+----
+
+* Slave
+
+----
+pcm_slave.<name> {
+}
+----
+
+=== Alias Names to ALSA Devices
+
+* If the audio devices has to be given a functional name rather than a
+  hardware name.
+
+* instead of "hw:1,0,0", if wanted to name that as `front` speaker.
+
+* then `HW` plugin can be used.
+
+----
+ +-------------+    +---------+    +---------+
+ | Application |--->|  front  |--->| hw:1,0,0|
+ +-------------+    +---------+    +---------+
+ 		     (Virtual      (Real
+		       Device)       Device)		   
+----
+
+=== HW Plugin for Alias Names
 
 * This plugin allows application to directly access the hardware.
 
@@ -237,6 +334,27 @@ pcm.front {
 $ aplay -D front test.wav 
 ----
 
+=== Rate Conversion
+
+* If the audio samples from source file is of 48KHz and if it has to
+  be played on to a destination audio device whose clock is 44.1KHz,
+  then it is not possible to play the audio directly.
+
+* Then the sample rate of the source audio has to be converted to the
+  end device's capable frequency.
+
+* Rate Plugin can help on this conversion.
+
+
+----
+                48Khz          44.1KHz 
+ +-------------+    +---------+    +---------+
+ | Application |--->| Convert |--->| hw:1,0,0|
+ +-------------+    +---------+    +---------+
+ 		     (Virtual      (Real
+		       Device)       Device)		   
+----
+
 === Rate Plugin
 
 * This plugin allows to convert the bitrate of the PCM
@@ -249,28 +367,94 @@ pcm_slave.front {
 	    rate 44100   
 } 
 
-pcm.rate_convert {
+pcm.convert {
 	type rate
 	slave front	 
 }
 
 ---- 
  
-=== Copy Plugin
 
-* 
+=== Channel and Encoding Conversion
 
-* 
+In some cases we may need convert audio parameters based on limitation
+on the hardware
+
+* May be audio file is stereo but hardware supports only mono.
+
+* Audio file has 16 bit samples but hardware supports only 8 bit
+  samples.
+
+----
+                Stereo          Mono 
+ +-------------+    +---------+    +---------+
+ | Application |--->| Convert |--->| hw:1,0,0|
+ +-------------+    +---------+    +---------+
+ 		     (Virtual      (Real
+		       Device)       Device)		   
+----
 
 === Plug Plugin
 
-* 
+* It is a generic plugin which allows to convert the audio parameters
+  like channel, bitrate and type for the slave stream.
 
-* 
+----
+pcm.name {
+	 type plug
+	 slave {
+	       pcm <str>
+	       format <str>
+	       channels <int>
+	       rate <int>
+	 }
+	 ttable {
+	 	cchannel {
+			 schannel <real>
+		}
+	 }
+}
+----
+=== Transfer Table
 
+----
+ttable [
+       cchannel.schannel
+]
+----
+    
 === Dmix Plugin
 
-=== Rate Plugin
+* A mixer Plugin which would receive the PCM samples from different
+  applications through IPC.
+
+* It it mixes them up and writes to slave.
+
+----
+pcm.!default {
+	     type plug
+	     slave.pcm "dmixer"
+}
+
+pcm.dmixer  {
+  	    type dmix
+ 	    ipc_key 1024
+ 	    slave {
+	    	  pcm "hw:1,0"
+	      	  period_time 0
+	      	  period_size 1024
+		  buffer_size 4096
+		  rate 44100
+	    }
+	    bindings {
+                  #CC SC 	    	     
+		    0 0
+		    0 1
+	    }
+}
+
+----
+
 
 == References
 
@@ -287,3 +471,9 @@ pcm.rate_convert {
 * https://blog.linuxplumbersconf.org/2009/slides/Paul-Davis-lpc2009.pdf
 
 * https://pdfs.semanticscholar.org/presentation/0567/64499520e685333302f25128f5eed46cfbd6.pdf
+
+* https://www.alsa-project.org/main/index.php/XRUN_Debug
+
+* https://www.alsa-project.org/main/index.php/FramesPeriods
+
+* http://equalarea.com/paul/alsa-audio.html
