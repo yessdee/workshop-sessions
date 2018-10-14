@@ -1,0 +1,235 @@
+= Text Editors Handout
+
+== Introduction
+=== Why Text Editors
+
+    * Most important tool for a Linux user
+    * Text files are used for source code, configuration files,
+      typesetting, web pages, emails and so on
+    * Powerful text editors make using Linux easier
+
+=== Why Command Line Editors
+
+    * Most of the Linux/Unix machines were server which need to be
+      used through remote machines.
+
+    * Non-GUI command line editors have low network nandwidth
+      requirement.
+
+    * Embedded systems also provide console over serial port, where
+      only command line tools coould be used.
+
+=== Popular Editors
+
+    * Vi / Vim
+
+    * Emacs
+
+== Vim
+
+=== Modes
+
+ * Command Mode
+
+   - operations like save, search, copy, paste etc.,
+
+ * Insert Mode
+
+   - allows to edit file 
+
+=== Command Operations 
+
+ * Open a file
+----
+ :e <filename>
+----
+
+
+ * Close a file
+----
+ :q 
+----
+
+=== Navigating the Contents
+
+ * Use arrow keys to navigate line by line or character by character
+   in Vim, use below strokes for Vi
+
+---- 
+   h - left, j - down, k - up, l - right
+----
+
+ * Navigating within a Screen
+
+----
+   H - Top of screen, 
+   M - Middle of the screen, 
+   L - Bottom of the screen 
+---- 
+
+=== Navigating the Contents Contd.
+
+ * Navigating the File
+----
+   1G - First line of file
+   G  - Last line of file
+   nG - nth line of file
+   
+----
+
+ * Navigating within a line
+
+----
+   0 - start of line, $ - end of line
+   w - next word, b - previous word e - end of current word
+----
+
+=== Switch Between Modes
+
+ * Press `I` for insert mode where allows you edit the contents of the
+   file.
+
+ * Press `ESC` to return to command mode
+
+=== Save Contents
+
+ * Save a file
+----
+ :w
+----
+
+ * Save and quit
+
+----
+ :wq
+----
+
+ * Quit without saving
+
+----
+ :q!
+----
+
+=== Editing Contents
+
+* insert a line
+
+----
+  o - to insert a next line
+----
+
+* delete a line
+
+----
+  dd - delete a line
+  cc - clear contents of a line
+----
+
+* delete
+
+----
+   x - delete a character(del)
+  dw - delete a word
+----
+
+=== Reuse Contents
+
+* Copy Paste
+  
+----
+  yy - copy(yank) current line
+  p - paste copied line in current position
+----
+
+
+* Cut Paste
+
+----
+  d - delete current line
+  p - paste
+----
+
+=== Code Edits
+
+* Comment a region with #
+
+----
+  Ctrl + V + } + I + # + ESC
+----
+
+* Indent a region with a Tab
+
+----
+  ==   -  indent a line
+  >ip  -  tab indent a paragraph
+----
+
+* Match Parens
+
+----
+  % - move to matching paren
+----
+
+=== Test Editing
+
+* Case convertion
+
+----
+  ~     - toggle the case of the letter
+  gUU   - to uppercase a line
+  guu   - to lowercase a line
+----
+
+* Line wrap 
+
+----
+   :set textwidth=80
+   gq
+---- 
+
+=== Handling Multiple Files
+
+* splitting the screen
+
+----
+   :sp  - for horizontal split
+   :vsp - for vertical split
+----
+
+* Switching between windows
+
+----
+   CTRL-WW - switch to other window
+----
+
+=== Line Numbering
+
+* Line numbers
+
+----
+  :set number - to display lines with number
+  :set nonumber - to disable line numbers 
+----
+
+* Go to Line
+
+----
+  :n - goes to line number n
+----
+
+=== Find and Replace 
+
+* Find
+
+----
+  /<string> - will search string in the text
+  n         - will go to next next matches
+  N         - will look for matches backward
+----
+
+* Replace
+
+----
+  :%s/<find>/<replace>/g
+  - `find` in all lines would be changed to `replace` in whole file
+----
