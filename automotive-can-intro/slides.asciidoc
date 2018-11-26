@@ -1,4 +1,5 @@
 = Introduction to Automotive and CAN
+Version 0.4
 
 == Preface
 
@@ -11,43 +12,77 @@
 * Expected that audience go through the terms and get the details by
   their own.
 
-* Certain representational links are also added, to narrow down the
-  audience to focus on the key areas.
+* Most of the information are available in Wikipedia, Certain
+  representational links are also added, to narrow down the audience
+  to focus on the key areas.
 
 == Automotive 
 
-=== Automotive Basic Devices
+=== Automotive Devices
+
+In a vehicle there are numerous electronic devices available in which
+
+* Few are mandatory and others are for comfort.
+
+* Few devices are hidden inside the body and few are visible
+
+* Few add's up for vehicular features and some for user experience.
+
+* Few for safety and few for luxury
+
+* References 
+  - https://en.wikipedia.org/wiki/Automotive_electronics
+
+=== Automotive Primitive Devices
+
+These devices are mandatory and exists in every devices.
 
 * Electronic Control Unit (ECU)
 
 * Electronic Instrument Cluster
 
-=== Automotive Devices
+=== Automotive Supplementary Devices
+
+These devices are there to improve the comfort and driving experience
 
 * Automotive Head Units (AHU) 
 
-* In-Vehcile Infotainment (IVI)
+* In-Vehicle Infotainment (IVI)
 
 * Telematics Control Unit (TCU)
 
 * Advanced Driver Assistance System (ADAS)
   - Heads-Up Display (HUD)
 
+=== Automotive Integrated Devices
+
+* Integrated Cockpits
+
+  - Is like having IVI, Clusters & ADAS together as same device.
+
 === Automotive Features for Future
+
+These are upcoming features
 
 * Autonomous Driving
 
 * Vehicle to Vehicle (V2V)/ Vehicle to Roadside (V2R) / (V2X)
 
-=== Electroni Control Unit (ECU)
+== Devices in Detail
+
+=== Electronic Control Unit (ECU)
+
+These are elementary devices stays invisible from outside, which
+monitors and controls the electro-mechanic parts of the car. Some of
+the ECU types are
 
  * Engine Control Module (ECM)
 
- * Powertrain Control Module (PCM)
+ * Power-train Control Module (PCM)
 
- * Brake Control Module (BCM)
+ * Brake Control Module (BM)
 
- * Tranmission Control Unit (TCU)
+ * Transmission Control Unit (TCU)
 
  * Suspension Control Module (SCM)
 
@@ -59,21 +94,23 @@
 
 === Instrument Cluster
 
-* Dashboard Types
-  - Digital & Analogue Gauges 
+This panel which stays behind the steering and gives user several
+vehicular control and information 
 
-* Speedometer, Tachometer and Odometer
+* Major Types 
+  - Digital with a LCD Panel and a Graphical HMI
+  - Analogue with dials and Gauges
 
-* Fuel Gauge
+* It has several metrical features like 
+  - Speedometer, Tachometer and Odometer
+  - Fuel Gauge and Oil temperature gauge 
 
-* Telltales (Indicators)
+* Telltales (Warnings & Indicators)
   - turn
-  - seatbelt warning
+  - seat-belt warning
   - engine malfunction
   
-=== Automotive Devices Reference
-
-* Cluster
+=== Cluster Reference
 
   - https://www.edn.com/design/automotive/4437780/The-basics-of-automotive-cluster-device-architectures-and-applications-part-I
 
@@ -81,27 +118,259 @@
 
   - https://www.unece.org/fileadmin/DAM/trans/main/wp29/wp29wgs/wp29grsg/grsginf/81/grsg81_inf11.doc
 
-=== Automotive Devices Reference
+=== In Vehicle Infotainment
 
-* Infotainment 
+Initially car had only vehicle audio system, later they were added
+standard interfaces and size specifications, it was called as
+automotive head-unit(AHU).
+
+The AHU were added with much more features to provide more
+information like location, phone sync to user, where the infotainment
+(information + entertainment) devices born.
+
+=== Infotainment References
+ 
+  - https://en.wikipedia.org/wiki/Automotive_head_unit
 
   - https://elearning.renesas.com/pluginfile.php/355/mod_folder/content/0/DevCon_On-the-Road/DevCon_On-the-Road/Automotive/Infotainment_and_Telematics_Solutions_with_Renesas_R-Car.pdf?forcedownload=1
   
   - http://support7.qnx.com/download/download/26204/QNX_CAR_Architecture_Guide.pdf
 
-* Telematics
+=== Telematics Devices
+
+This devices when added to the vehicle makes it to be a connected
+device, where the vehicle can be monitored and controlled from remote
+machine.
+
+=== Telematics References
 
   - http://www.ti.com/solution/telematics_control_unit?variantid=20402&subsystemid=21708
 
   - https://www.slideshare.net/embitel1/what-is-telematics-control-unit-tcu
 
   - https://www.fev.com/fileadmin/user_upload/DGE/Data_Sheets/DGE_TCU_Datasheet.pdf
- 
-== CAN in Automotive
-  
-=== Usage Profiles in Automotive
 
-* Vehicle Communication interfaces between ECUs
+=== ADAS
+
+* Advanced Driver Assistance Systems the automotive devices which
+  helps in improving the driving experience and road safety.
+
+* Some of the features are supported in cluster and some are in
+  infotainment.
+
+* ADAS features are listed in
+- https://en.wikipedia.org/wiki/Advanced_driver-assistance_systems
+
+=== Autonomous Car
+
+* https://en.wikipedia.org/wiki/Self-driving_car
+
+== Software Architecture for ECUs and Clusters
+
+=== Software Stack
+
+----
+                         +-----------+
+                         |    App    |
+   +------------+        +-----------+ 
+   |     App    |        |    OS     |
+   +------------+        +-----------+
+   |     SBL    |        |    SBL    |
+   +------------+        +-----------+  
+   |     PBL    |        |    PBL    |
+   +------------+        +-----------+
+   |     MCU    |        |    MCU    |
+   +------------+        +-----------+
+
+----
+
+=== Automotive OS
+
+----                       
+                           Complex OS
+                         +-----------+
+        OS               |    App    |
+   +------------+        +-----------+ 
+   |   App      |        |  Services |
+   +------------+        +-----------+
+   | Scheduler  |        | Scheduler |
+   +------------+        +-----------+  
+   |     HAL    |        |    HAL    |
+   +------------+        +-----------+
+   |     MCU    |        |    MCU    |
+   +------------+        +-----------+
+
+----
+
+
+=== MCUs for automotive
+
+* They might comply to automotive grade
+
+* They might have automotive communication interfaces like CAN / LIN
+
+* Example V850(Low End)/RH850(High End) from Renesas
+
+* References
+  - https://www.renesas.com/in/en/products/microcontrollers-microprocessors/rh850.html
+
+=== Boot-loaders
+
+* Primary Boot-loader (PBL)
+  - Non upgradeable
+  - Mandatory
+
+* Secondary Boot-loader (SBL)
+  - Upgradeable
+  - optional
+
+* They should support flash driver and communication interface
+  driver(CAN / LIN)
+
+* They should support feature of Reflashing new application and
+  booting them.
+
+=== Operating System
+
+* It can be based on Non-OS solution
+
+* Based on General Purpose RTOSes like
+
+  - QNX  (Blackberry)
+  - Integrity OS (Greenhills)
+
+* Based on Automotive standard OS
+
+  - Autosar Compliant
+    -- Microsar (Vector)
+
+  - OSEK / VDX Compliant
+
+=== Application
+
+* Network communication and diagnostics.
+
+* Power management to handle sleep modes.
+
+* Automotive sensor data and packet processing.
+
+* HMI, Bezel buttons, telltales and beep management in case of
+  clusters.
+
+* Image download, verification and reflashing
+
+=== Application Design
+
+The automotive applications may use below different features based on
+the complexity of the device
+ 
+* Thread design on RTOS or Asynchronous state-machine design on Non-OS
+  systems.
+
+* Message based communication using central message broker.
+
+* Microservices Architecture where separate thread for each
+  functionality.
+
+=== Standards in Application Dev
+
+The automotive software development may follow below given standards
+for code development.
+
+* Functional Safety (ISO 26262) Specification.
+  - Automotive Safety Integrity Level
+
+* MISRA (ISO/TR 15497) is coding guidelines.
+
+=== References
+
+  - https://www.diva-portal.org/smash/get/diva2:580183/FULLTEXT01.pdf
+
+  - https://vector.com/vi_flashbootloader_en.html
+
+  - https://www.embitel.com/flash-bootloader-solutions-for-ecu-reprogramming
+
+  - https://blog.parasoft.com/leveraging-automotive-development-standards-to-mitigate-risk
+
+  - https://en.wikipedia.org/wiki/ISO_26262
+
+  - https://en.wikipedia.org/wiki/Automotive_Safety_Integrity_Level
+
+  - https://en.wikipedia.org/wiki/MISRA_C
+
+  - https://www.embitel.com/blog/embedded-blog/understanding-how-iso-26262-asil-is-determined-for-automotive-applications
+
+== Autosar
+
+=== Autosar Architecture
+
+* An POSIX like specification for Automotive OS
+
+* Layered Architecture where Application works on higher layer and
+  MCAL(microcontroler adaptation layer) at the bottom.
+
+* All other OS facilities are provided as APIs and services.
+
+* Software components are developed as callbacks and invoked by
+  runtime environment(RTE).
+
+* Most of the components supports RPC kind of interprocess
+  communication for message passing.
+
+
+=== Links
+
+  * https://www.embitel.com/blog/embedded-blog/what-is-autosar-mcal-software-architecture
+
+  * https://www.embitel.com/tag/autosar-development
+
+  * https://retis.sssup.it/sites/default/files/lesson19_autosar.pdf
+ 
+== Automotive Communication Interfaces
+
+=== Automotive Network
+
+* Since there were lots of electronic devices available in the car and
+  there is a need for them to communicate between them.
+
+* There came the need for vehicle network or vehicle communication bus
+  through which the devices can communicate.
+
+=== Vehicular Busses
+
+* Data Communication Busses
+
+  - CAN (Control Area Network)
+
+  - LIN (Local Area Network)
+
+  - K-Line (ISO 9141-2) - Deprecating
+
+  - VAN (Vehicle Area Network)
+
+  - FlexRay 
+
+* Media Communication Busses
+
+  - MOST (Media Oriented System Transport)
+
+  - Ethernet AVB (Audio Video Bridging)
+
+=== Vehicular Busses References
+
+  - https://en.wikipedia.org/wiki/Vehicle_bus
+
+  - https://www.nxp.com/files-static/training_pdf/20451_BUS_COMM_WBT.pdf
+
+  - https://eng.umd.edu/~austin/enes489p/project-resources/SchmidAutoBusSystems.pdf
+
+  - https://irjet.net/archives/V4/i7/IRJET-V4I7181.pdf
+
+  - http://www.ni.com/white-paper/9733/en/
+
+=== Vehicle Network Usage Profiles
+
+* Vehicle Communication interfaces between ECUs and other devices.
 
 * Diagnostics Interfaces
 
@@ -109,21 +378,12 @@
 
 * Acquisition and Calibration Interfaces
 
-=== Contenders
+=== CAN
 
-* LIN (Local Area Network)
+* CAN became the popular bus interface for data communication between
+  devices.
 
-* K-Line (ISO 9141-2) - Deprecating
-
-* VAN (Vehicle Area Network)
-
-* References
-
-  - https://irjet.net/archives/V4/i7/IRJET-V4I7181.pdf
-
-  - http://www.ni.com/white-paper/9733/en/
-
-=== Architecture
+=== CAN Architecture
 
 * Multi Master / slave model
 
@@ -307,7 +567,6 @@
 
 * CANopen                 - Embedded Automation
 
-
 === Protocol Stacks
 
 * References
@@ -330,6 +589,8 @@
   
   - https://download.atlantis-press.com/article/25864359/pdf
 
+  - https://www.sti-innsbruck.at/sites/default/files/courses/fileadmin/documents/vn-ws0809/03-vn-CAN-HLP.pdf
+
 === OnBoard Diagnostics
 
   - emissions-related on-board diagnostics (OBD) as specified in ISO
@@ -344,6 +605,12 @@
 
   - end of life activation on on-board pyrotechnic devices(restraint
     system) (ISO 26021)
+
+=== OBD References
+
+  - https://en.wikipedia.org/wiki/OBD-II_PIDs
+
+  - http://www.ni.com/pdf/manuals/372139d.pdf
 
 === Generic CAN Stack for Diagnostics
 
@@ -365,13 +632,18 @@
 === CAN Specific Tools
 
 * CAN Debuggers (Vector)
-  - CANanalayzer - One Node Simulation
+  - CANalayzer   - One Node Simulation
   - CANoe        - Multi Node Simulation
   - CAPL         - Scripting Language
   - CANape       - Calibration 
 
+* Alternative Tools
 
-=== Automotive Coding Tools
+  - https://github.com/rbei-etas/busmaster 
+  - https://www.gridconnect.com/products/can-usb-adapter-pcan-usb
+  - https://www.csselectronics.com/screen/page/dbc-database-can-bus-conversion-wireshark-j1939-example/language/en
+
+=== Automotive Specific Tools
 
 * Static Analysis & Misra Compliance
   - Coverity
@@ -379,19 +651,15 @@
 * Unit Testing
   - Vectorcast
 
-* OS and Middleware
-  - Vector Autosar OS
-  - OSEK/VDX
-
 * JTAG Debugger
   - Lauterbach
 
-=== Opensource CAN Stacks
+=== Opensource CAN Devices & Stacks
 
 * SocketCAN in Linux 
   - RAW, BCM, ISOTP & SAEJ1939
 
-* Opensource OBD-II platform with isotp and uds protocol
+* Openxc - Opensource OBD-II platform with ISOTP and UDS protocol
   implementation
 
 * Reference 
@@ -400,3 +668,5 @@
   - https://elinux.org/Can-utils
   - https://github.com/GENIVI/CANdevStudio
   - https://github.com/openxc
+
+* 
