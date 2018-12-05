@@ -1,5 +1,5 @@
 = Introduction to Automotive and CAN
-Version 0.4
+Version 0.5
 
 == Preface
 
@@ -189,9 +189,9 @@ machine.
 ----                       
                            Complex OS
                          +-----------+
-        OS               |    App    |
+        OS               | App / HMI |
    +------------+        +-----------+ 
-   |   App      |        |  Services |
+   | App / HMI  |        |  Services |
    +------------+        +-----------+
    | Scheduler  |        | Scheduler |
    +------------+        +-----------+  
@@ -246,6 +246,19 @@ machine.
 
   - OSEK / VDX Compliant
 
+=== HMI Frameworks
+
+* Ebguide from electrobit
+
+* Kanzi from rightware
+
+* Links
+
+  - http://intellicsengineering.com/content/rt7df3478/IntellicsFrameworkWhitepaper.pdf
+
+  - http://info.services.harman.com/rs/378-OMF-030/images/Factsheet_HCS_Auto_HMI_Development_Services.pdf
+
+
 === Application
 
 * Network communication and diagnostics.
@@ -281,6 +294,18 @@ for code development.
   - Automotive Safety Integrity Level
 
 * MISRA (ISO/TR 15497) is coding guidelines.
+
+=== HMI Frameworks
+
+* Ebguide from electrobit
+
+* Kanzi from rightware
+
+* Links
+
+  - http://intellicsengineering.com/content/rt7df3478/IntellicsFrameworkWhitepaper.pdf
+
+  - http://info.services.harman.com/rs/378-OMF-030/images/Factsheet_HCS_Auto_HMI_Development_Services.pdf
 
 === References
 
