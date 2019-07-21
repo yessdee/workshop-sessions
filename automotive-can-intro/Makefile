@@ -7,15 +7,17 @@ images_png = $(images_dia:.dia=.png)
 #images_png += figures/winxp-layout.png \
 	      figures/linux-layout.png 
  
-all: slides.html
+all: slides.html slides1.html slides2.html
 
 %.png: %.svg
 	inkscape --without-gui --export-background=white --export-area-drawing --export-png=$@ $<
 
 slides.html: $(images_png)
+slides1.html: $(images_png)
+slides2.html: $(images_png)
 
 clean:
 	rm -f $(images_png)
-	rm -f slides.html
+	rm -f slides*.html
 
 include $(TOPDIR)/stylesheets/Makefile.rules

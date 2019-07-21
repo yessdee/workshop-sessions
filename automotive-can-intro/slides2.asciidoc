@@ -1,0 +1,224 @@
+= ECUs and Clusters
+
+== Software Architecture for ECUs and Clusters
+
+=== Software Stack
+
+----
+                         +-----------+
+                         |    App    |
+   +------------+        +-----------+ 
+   |     App    |        |    OS     |
+   +------------+        +-----------+
+   |     SBL    |        |    SBL    |
+   +------------+        +-----------+  
+   |     PBL    |        |    PBL    |
+   +------------+        +-----------+
+   |     MCU    |        |    MCU    |
+   +------------+        +-----------+
+
+----
+
+=== Automotive OS
+
+
+----
+                       
+                           Complex OS
+                         +-----------+
+        OS               | App / HMI |
+   +------------+        +-----------+ 
+   | App / HMI  |        |  Services |
+   +------------+        +-----------+
+   | Scheduler  |        | Scheduler |
+   +------------+        +-----------+  
+   |     HAL    |        |    HAL    |
+   +------------+        +-----------+
+   |     MCU    |        |    MCU    |
+   +------------+        +-----------+
+
+----
+
+
+=== MCUs for automotive
+
+* They might comply to automotive grade
+
+* They might have automotive communication interfaces like CAN / LIN
+
+* Example V850(Low End)/RH850(High End) from Renesas
+
+* References
+  - https://www.renesas.com/in/en/products/microcontrollers-microprocessors/rh850.html
+
+=== Boot-loaders
+
+* Primary Boot-loader (PBL)
+  - Non upgradeable
+  - Mandatory
+
+* Secondary Boot-loader (SBL)
+  - Upgradeable
+  - optional
+
+* They should support flash driver and communication interface
+  driver(CAN / LIN)
+
+* They should support feature of Reflashing new application and
+  booting them.
+
+=== Operating System
+
+* It can be based on Non-OS solution
+
+* Based on General Purpose RTOSes like
+
+  - QNX  (Blackberry)
+  - Integrity OS (Greenhills)
+
+* Based on Automotive standard OS
+
+  - Autosar Compliant
+    -- Microsar (Vector)
+
+  - OSEK / VDX Compliant
+
+
+=== Application
+
+* Network communication and diagnostics.
+
+* Power management to handle sleep modes.
+
+* Automotive sensor data and packet processing.
+
+* HMI, Bezel buttons, telltales and beep management in case of
+  clusters.
+
+* Image download, verification and reflashing
+
+=== Application Design
+
+The automotive applications may use below different features based on
+the complexity of the device
+ 
+* Thread design on RTOS or Asynchronous state-machine design on Non-OS
+  systems.
+
+* Message based communication using central message broker.
+
+* Microservices Architecture where separate thread for each
+  functionality.
+
+* Links
+  - https://ac.els-cdn.com/S1474667016350108/1-s2.0-S1474667016350108-main.pdf?_tid=7b02ea49-6856-4f21-b42d-3c983880c125&acdnat=1544425551_33b32865a759466a31589728abd0b256
+  - https://www.eventhelix.com/RealtimeMantra/Patterns/#.XA4PkJ9fg8o
+
+=== Standards in Application Dev
+
+The automotive software development may follow below given standards
+for code development.
+
+* Functional Safety (ISO 26262) Specification.
+  - Automotive Safety Integrity Level
+
+* MISRA (ISO/TR 15497) is coding guidelines.
+
+=== HMI Frameworks
+
+* Ebguide from electrobit
+
+* Kanzi from rightware
+
+* Links
+
+  - http://intellicsengineering.com/content/rt7df3478/IntellicsFrameworkWhitepaper.pdf
+
+  - http://info.services.harman.com/rs/378-OMF-030/images/Factsheet_HCS_Auto_HMI_Development_Services.pdf
+
+=== HMI Components
+
+* Widgets
+
+* Fonts
+
+* Images
+
+* Animations
+
+=== Automotive Testing
+
+* Functional, safety critical etc.,
+
+* Software in Loop (SIL), Hardware in Loop (HIL) 
+
+* Links
+  - https://www.slideshare.net/sakella72/ecu-verification-validation
+
+  - http://www.diva-portal.org/smash/get/diva2:435593/FULLTEXT01.pdf
+
+  - https://www.slideshare.net/QAIOffical/improvised-functional-tests-for-automotive-testing
+
+=== References
+
+  - https://www.diva-portal.org/smash/get/diva2:580183/FULLTEXT01.pdf
+
+  - https://vector.com/vi_flashbootloader_en.html
+
+  - https://www.embitel.com/flash-bootloader-solutions-for-ecu-reprogramming
+
+  - https://blog.parasoft.com/leveraging-automotive-development-standards-to-mitigate-risk
+
+  - https://en.wikipedia.org/wiki/ISO_26262
+
+  - https://en.wikipedia.org/wiki/Automotive_Safety_Integrity_Level
+
+  - https://en.wikipedia.org/wiki/MISRA_C
+
+  - https://www.embitel.com/blog/embedded-blog/understanding-how-iso-26262-asil-is-determined-for-automotive-applications
+
+== Autosar
+
+=== Autosar Architecture
+
+* An POSIX like specification for Automotive OS
+
+* Layered Architecture where Application works on higher layer and
+  MCAL(microcontroler adaptation layer) at the bottom.
+
+* All other OS facilities are provided as APIs and services.
+
+* Software components are developed as callbacks and invoked by
+  runtime environment(RTE).
+
+* Most of the components supports RPC kind of interprocess
+  communication for message passing.
+
+
+=== Links
+
+  * https://www.embitel.com/blog/embedded-blog/what-is-autosar-mcal-software-architecture
+
+  * https://www.embitel.com/tag/autosar-development
+
+  * https://retis.sssup.it/sites/default/files/lesson19_autosar.pdf
+  
+  * https://github.com/parai/as
+
+  * https://github.com/TrampolineRTOS/trampoline
+
+  * https://github.com/evidence/erika3
+
+  * http://164.100.133.129:81/econtent/Uploads/10-Osek.pdf
+
+=== Automotive Specific Tools
+
+* Static Analysis & Misra Compliance
+  - Coverity
+
+* Unit Testing
+  - Vectorcast
+
+* JTAG Debugger
+  - Lauterbach / Multi
+  - Renesas E1 / E2 Emulators
