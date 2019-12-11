@@ -1,0 +1,527 @@
+= Android Introduction
+
+== History
+
+=== Timeline
+
+* Started as a Digital Camera OS by Android Inc.
+
+* Andy Rubin and Friends incorporated Android Inc by Oct 2003
+
+* Diverted its efforts for Mobile Handset OS later
+
+* Android Inc was acquired by Google in 2005
+
+* Openhandset Alliance was formed on 2007, including Google, device
+  manufacturers(HTC, Motorola, Samsung), Telcos(Sprint, T-Mobile) and
+  Chip makers (Qualcomm & TI) to develop a standard Mobile Handset OS.
+
+* First Android phone is HTC Dream launched in Sep, 2008
+
+=== Releases
+
+* Releases were named by desserts and was in alphabetical order.
+
+* Phone only release 
+
+  - Petit Four(1.1), Cupcake(1.5), Donut(1.6), Eclair(2.0), Frozen
+    Yogurt(2.2), Ginger Bread(2.3).
+
+* Tab only release
+  - Honeycomb(3.0)
+
+* Mobile + Phone Version
+  - Icecream Sandwich(4.0), Jelly Bean (4.1), Kitkat(4.4)
+
+* Releases in Last 5 Years
+
+  - Lollipop(5.0), Marshmallow(6.0), Nougat(7.0), Oreo(8.0), Pie(9.0),
+    android 10
+
+* Release naming convention has been changed from *Android 10*, the
+  dessert naming convention dropped and only version numbering is
+  adopted for simplicity.
+
+=== Android Layers
+
+----
++----------------------+
+|Android Applications  |
++----------------------+
+|Android OS Components |
++----------------------+
+|Linux OS Components   |
++----------------------+
+|Linux Kernel          |
++----------------------+
+| Hardware             |
++----------------------+
+----
+
+[style="two-column"]
+=== Android vs Linux OS Layers
+
+[style="left"]
+==== Android
+----
++----------------------+
+|Android Applications  |
++----------------------+
+|Android OS Components |
++----------------------+
+|Linux OS Components   |
++----------------------+
+|Linux Kernel          |
++----------------------+
+| Hardware             |
++----------------------+
+----
+
+[style="right"]
+==== Linux
+
+----
++----------------------+
+|		       |
+|Linux Applications    |
++----------------------+
+|		       |
+|Linux OS Components   |
++----------------------+
+|Linux Kernel          |
++----------------------+
+| Hardware             |
++----------------------+
+----
+
+=== AOSP and GMS
+
+* Android Open Source Project (AOSP) is the opensource portion of the
+  Android OS.
+
+* It comprises of most of the portion of the Android OS components.
+
+* This source can be modified by OEM's and by the developers for their
+  need.
+
+* Few other Android application components which are Google's
+  proprietary software, are provided as Google Mobile Services.
+
+* GMS needs to be licensed from Google by OEMs
+
+=== Google Mobile Services
+
+* Google Mobile Serives (GMS) has 
+  - Google Play Store, Google Play Services
+  - Google Photos, Google Play Music, Youtube 
+  - GMail, Google Drive, Google Duo
+  - Google Search, Google Maps, Google Chrome.
+
+* Google Play Services provides APIs to access Google's Maps,
+  advertisement, permission management.
+
+* Any Android application to work seamlessly across different version
+  of Android it may use Google Play Services API.
+
+=== AOSP & GMS
+
+----
++----------------------+
+|Android Apps |   GMS  |
++----------------------+
+|Android OS Components |\
++----------------------+ \
+|Linux OS Components   |  \
++----------------------+  AOSP
+|Linux Kernel          |  /
++----------------------+ /
+| Hardware             |/
++----------------------+
+----
+
+=== Android Compatibility Program
+
+* Android source is released by Google through AOSP 
+
+* Device Manufacturers can take the AOSP source and can modify it for
+  their target requirements.
+
+* To contain the modifications and verify them against the Android
+  ecosystem, Google supports Android Compatibility Program.
+
+* They define a `Android Compatibility Definition Document (CDD)`,
+  which has hardware and software requirement for a compatible device.
+
+* They have also provided the test suite `Android Compatibility Test
+  Suite (CTS)`, which can verify the device is compatible.
+
+* CDD and CTS gets updated to each version of Android release.
+
+=== Licensing GMS
+
+* Once the Android Compatibility Tests are completed and fixed, device
+  manufacturers can approach Google for GMS.
+
+== Understanding Android Layers 
+
+=== Hardware
+
+* Android supports predominantly ARM & Intel X86 architecture
+
+* Mostly preferrably devices with Display
+
+* Mobiles, TVs, Wearables & Automotive Infotainment
+
+=== Linux Kernel
+
+  * Create higher level abstractions like files, processes, pipes,
+       sockets, etc on top of the hardware.
+
+  * Manage sharing of system resources - CPU, Memory, Devices.
+
+  * Supports drivers for all the devices.
+
+=== Linux OS Components
+
+* Shell, and other utilities from Toybox
+
+* Bionic C library 
+
+* SQlite for database
+
+* WiFi Supplicant and dnsmasq for networking
+
+=== Android OS Components
+
+* Android RunTime (ART) which executes all the Java Programs
+
+* Java Based Android Framework
+  - Window Manager    - Displaying the app on the screen 
+
+  - Acitivity & Package Manager - App installation and Launching
+
+  - Telephony Manager - For calls and SMS
+
+* C/C++ Android Libraries and Services
+
+  - Audio Flinger - Audio from framework  to audio driver
+
+  - Surface Flinger - Screens from framework to graphics driver
+
+  - Hardware Abstraction Layer (HAL) - Others data back and forth from
+    the framework and the driver.
+
+=== Android Layers Bridge
+
+* Java Frameworks talks to C/C++ libraries and services through
+
+  - Binder Inter Process Communication(IPC)
+  - Java Native Interface (JNI)
+
+----
++-------------------+
+|   User            |
++-------------------+--------- (Touch)
+| Java Application  |
++-------------------+--------- (API Calls)
+| Java Framework    |
++-------------------+--------- (JNI/IPC)
+| C/C++ HAL         |
++-------------------+--------- (Syscall)
+| Linux Kernel      |
++-------------------+--------- (Memory & IO access)
+| Hardware          |
++-------------------+
+----
+
+
+== Why Linux in Android
+
+=== Embedded Vs Open Systems
+
+* *Embedded System* - Programmable electronics system immersed in a
+  larger physical system, and has fixed functionalities.
+
+* *Open System* - General purpose system which is inter-operable and
+  sticks to open standards, whose hardware and software features are
+  scaleable and extensible.
+
+* We are in an era of *Hybrid embedded systems*, where the devices built
+  has mixed properties of both embedded system and open system.
+
+* Currently the specific purpose embedded systems are classified as
+  *deeply embedded systems*.
+
+=== Embedded Software Model 
+
+* Mostly in deeply embedded systems monolithic binary image of
+  software called as *firmware* is developed.
+ 
+* In mid level embedded systems the minimalist *multi-threaded OS or
+  real-time OS (RTOS)* is used along with the application code to
+  build the firmware image.
+
+* In above firmware model the software features are freezed at compile
+  time itself and it cannot be scaled at later point.
+
+* The high level embedded systems are hybrid and uses *general purpose
+  operating systems (GPOS)*.
+
+=== Embedded Software Model Contd.
+
+image::figures/embedded-software-model.png[align="center"]
+
+=== High Level Embedded Systems Application
+
+They are used in
+
+  * Telecom
+
+  * Network
+
+  * Consumer electronics
+
+[role="two-column"]
+=== General Purpose Operating System
+
+[role="left"]
+
+ * Supports running several applications together.
+
+ * It would be multi-layered with multiple software components
+   integrated together.
+
+ * Follows open standards like POSIX
+
+ * Applications can be installed or removed at runtime.
+
+ * Applications are untrusted by OS and are provided less privileges.
+
+ * Linux, BSD, MAC, Windows etc.,
+
+[role="right"]
+image::figures/gpos-stack.png[]
+
+== Linux
+
+=== What is Linux
+
+  * *Unix-like:* a GPOS provides an interface similar to the Unix
+    operating system developed by Bell labs.
+
+  * *multi-tasking:* many different applications at the same time
+
+  * *multi-user:* many different users can use the system 
+
+  * *cross-platform:* supports wide variety of hardware - desktops,
+    mainframes, supercomputers, gaming stations, mobile phones,
+    routers, etc.
+
+== Linux Usage
+
+[role="two-column"]
+=== User Interaction
+[role="left"]
+  * User can interact to an UNIX system through `shell` or through
+    `desktop environment`.
+
+  * A *shell* is a command line application provides a means for
+    navigating through the file system, and launching other programs
+    on request.
+
+  * *Desktop environment* is the graphical replacement for shell and
+    provides much more convenience for desktop users.
+
+[role="right"]
+image:figures/unix-rings.png[width=588]
+
+=== Files in Linux
+
+  * `File system` allows to organize the user's data as `files` in a
+    convenient way in the storage devices.
+
+  * Files in GNU/Linux can be broadly classified as follows:
+    - `Regular files` like text files, images, binaries, pdfs etc., 
+    - `Directories` to group the related files
+    - `Links` is like shorcuts in windows
+    - And `Device files` which allows to access devices
+
+=== Device Files
+
+  * In GNU/Linux every device is represented by a file in `/dev`
+    directory. For example `/dev/sda` represents the hard disk,
+    `/dev/ttyS0` represents the serial port, `/dev/input/mice`
+    represents the mouse, ...
+
+  * Reading/writing to and from the device file, results in reading
+    from/writing to the device. To get mouse events the following
+    command can be used.
+
+=== File System Tree
+
+  * A file system tree, with all the necessary files is required for
+    Linux system to boot.
+
+  * Files present in the file system tree include
+    - system programs
+    - application programs
+    - configuration files
+    - device files
+
+=== Special Filesystems
+
+  * `procfs` - provides process and kernel related information as files.
+
+  * `sysfs`  - provides devices related information as files.
+
+  * `devtempfs` - provides device nodes for the devices.
+
+
+[role="two-column"]
+=== Layout
+
+[role="left"]
+.Windows XP Layout Tree
+image::figures/winxp-layout.png["Windows XP Layout Tree",width=288]
+
+[role="right"]
+.GNU/Linux Layout Tree
+image::figures/linux-layout.png["GNU/Linux Layout Tree"]
+
+===  Need for a File Systems
+
+  * Data corresponding to a file are stored in sectors of the
+    hard-disk.
+
+image::figures/no-fs.png[width=388, align="center"]
+    
+  * User has to remember the sectors that store the contents of a file.
+
+  * The user also has to keep track of which sectors are free.
+
+  * Managing files becomes tedious.
+
+  * The filesystem maintains a table, that maps filenames to the
+    sectors that contain the contents of the file.
+
+
+== Embedded Linux
+
+=== Why Embedded Linux?
+
+.Pros
+
+  * No royalties or licensing fee.
+  * Support is available from the community, as well from multiple
+    vendors. This avoids vendor lock in.
+  * Linux kernel supports a wide range of microprocessors and
+    peripherals devices.
+  * Re-use existing Linux application base.
+  * Re-use existing Linux resource pool in embedded systems.
+
+=== Why Embedded Linux Contd.
+
+.Cons
+
+  * Large memory foot print.
+
+  * The stock kernel only offers soft real-time capabilities. Third
+    party patches are available for latency reduction and adding hard
+    real-time capabilities.
+
+=== What is Embedded Linux
+
+  * Customizing the Linux and its allies for a custom target board.
+    - adding additional software for embedded interfaces
+    - removing unnecessary components to reduce time and space 
+
+[role="two-column"]
+=== Linux Software Components
+
+A bare minimal Linux system needs atleast below components.
+
+[role="left"]
+  * Boot Loader
+  * Kernel
+  * File System
+    - C library
+    - Shell & Utilities
+    - Init & Boot Scripts
+
+[role="right"]
+image::figures/boot-timeline.png[width=588]
+
+=== Boot Loader
+
+  * Low-level hardware initialisation, memory controller
+    initialisation, cache initialisation
+ 
+  * Provide a mechanism to locate, load and execute kernel with
+    necessary parameter.
+
+  * Popular embedded boot loaders are
+    - U-boot
+    - Redboot, uses drivers from eCOS RTOS.
+    - LK for android
+
+=== Kernel
+
+  * Create higher level abstractions like files, processes, pipes,
+       sockets, etc on top of the hardware.
+
+  * Manage sharing of system resources - CPU, Memory, Devices.
+
+== File System
+
+=== File System Format
+
+  * Specifies how files are laid out in a storage medium.
+
+  * Various filesystem drivers are available like
+
+    - *ext2/ext3/vfat* - filesystems commonly used in desktops
+
+    - *jffs2* - filesystem tuned for Flash based memory devices
+
+  * Pseudo filesystems are in-memory file systems which don't persist
+    the data, rather provides realtime information.  
+    - *proc:* process and kernel related information 
+    - *sysfs:* kernel devices related information
+    
+=== Rootfs Contents
+
+The rootfs has required files for system to function and user to
+use. Bare minimal rootfs would have atleast
+
+ * libraries required by applications
+
+ * Shell
+
+ * Initscripts to initialize the system
+ 
+=== Storage for Embedded Systems
+
+  * Hard disks are not suitable for embedded systems
+    - Contain moving parts
+    - Sensitive to physical shock
+    - Requires multiple power supply voltages
+
+  * Replaced by non-volatile memory devices - Flash
+
+  * Embedded Linux systems require > 4MB of Flash memory.
+
+
+=== What is Embedded Android
+
+* Android team had took the Linux kernel and opensource components as
+  a base.
+
+* They added few new features specific to Android in Linux kernel.
+
+* They replaced Copyleft License (GPL) based components with
+  Permissive license opensource software. Ex. glibc with bionic.
+
+* Android team added Java based Framework layer on top of Linux OS,
+  where users can develop applications in Java.
+
+
