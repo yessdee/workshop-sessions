@@ -1,0 +1,275 @@
+= Android Tools
+
+== Development Environment
+
+=== Desktop Components
+image::figures/desktop.png[width=600, align="center"]
+
+[style="two-column"]
+=== Target Hardware Components
+
+[role="left"]
+  * Processor
+  * Flash
+  * SDRAM
+  * Serial Port
+  * USB
+  * Display & Touch
+
+[role="right"]
+image::figures/hardware.png[]
+
+[role="two-column"]
+=== Development Setup
+
+[role="left"]
+  * Host System - development env.
+
+  * Target System - execution env.
+
+  * The application running in the target system read input from the
+    serial port, and send output to the serial port.
+
+  * In other words, the standard input and standard output of the
+    applications is attached to the serial port.
+
+[role="right"]
+image::figures/setup.png[]
+
+=== Development Setup Contd.
+
+  * Host system uses a serial terminal program like `minicom` and
+    `putty` to communicate with the target system.
+
+  * Kernel image and filesystem image download is done through USB
+    interface. Serial interface is not fast enough.
+
+=== Host Systems
+
+* Host system would have all the tools for developing software for the
+  target.
+
+* Host system is powerful enough by CPU, memory and storage to develop
+  software for the target.
+
+* Android SDK is one such tool which has to be installed in Host for
+  working with Android target.
+
+* Android Studio/SDK requires few GBs of storage. 
+
+* AOSP source build requires 40GB of storage.
+
+=== Target Systems
+
+* Target systems would comparatively low in memory and storage, which
+  can accomodate only compiled binaries.
+
+* Binaries built out of the source in Host, would be of size of few
+  MBs for apps and few GBs for OS.
+
+== Host Setup
+
+=== Host Specification
+
+* For Android Studio, 8 GB RAM, 4 GB Storage, Recommended 
+  
+* Android Studio can run on Windows/Linux/Mac
+
+* For AOSP Build, 16 GB RAM, 250 GB Storage, Recommended 
+
+* AOSP build can only be done on Linux / MAC OS.
+
+=== Android SDK
+
+* Android Studio is as an IDE(Integrated Development Environment) for
+  Android app development and debugging.
+
+* Studio uses Android SDK as backend, which has tools for Android app
+  development and debugging.
+
+* Android SDK has 
+  - SDK Platform       - APIs for Application Development
+  - SDK Build Tools    - Gradle and Android libraries for compiling App
+  - SDK Tools          - SDK Manager, AVD Manager, Emulator, DDMS for App testing 	
+  - SDK Platform Tools - adb, fastboot, systrace for working with target platforms
+
+=== Android Standalone SDK
+
+* For Non App developers Android Studio is not required and standlone
+  SDK or minimally Platform Tools are sufficient.
+
+* Android command line SDK are available in
+  https://developer.android.com/studio/index.html#downloads for
+  several OSes.
+
+* We can download install and update the packages, to get the tools.
+
+* In Linux(Ubuntu), SDK Platform Tools(adb) can be installed using
+  package manager.
+
+----
+$ sudo apt-get install android-tools-adb android-tools-fastboot
+----
+
+=== Target Communication
+
+* Android Target is connected to the Host using USB cable.
+
+* Android SDK provides adb and fastboot to test, debug and flash the
+  target.
+
+* Both adb and fastboot allows the host machine to interact with
+  target using USB cable.
+
+* If target is booted to Android OS, it can be interacted using `ADB`.
+
+* else if target had boot till bootloader, it can be interacted with
+  `fastboot` protocol.
+
+=== ADB 
+
+* Android Debug Bridge(ADB) is Host to Target communication interface
+  supported by Android.
+
+* It allows developers to test and debug the Android Devices.
+
+* ADB has three software components
+  - ADB Client, ADB Server in running Host PC.
+  - ADB Daemon running in Android Device
+
+* User would use only ADB Client to debug the Android devices.
+
+* ADB would work only when the Android device has booted till the
+  functioning OS.
+
+=== ADB Architecture
+
+image::figures/adb-setup.png[align="center", width=600]
+
+
+=== ADB for File Transfer
+
+* To check any android device is connected to the PC, which may show
+  whether device is detected or offline.
+ 
+----
+$ adb devices
+----
+
+* To push a file to the target
+
+----
+$ adb push <local file> <remote path>
+----
+
+* To get a file from the target
+
+----
+$ adb pull <remote file> <local path>
+----
+
+=== ADB for Interaction
+
+* To access shell commands
+
+----
+$ adb shell ls
+---- 
+
+* To access the device log
+
+----
+$ adb logcat
+----
+
+=== Troubleshooting
+
+* The target device should have the debugging mode enabled for adb
+  access.
+
+* Enable the debugging support in device and again
+
+* restart the server and check again.
+
+----
+$ adb kill-server
+$ adb start-server
+$ adb devices
+----
+
+=== Fastboot
+
+* It is a commandline tool which runs in Host PC, communicates with
+  target using USB.
+
+* Fastboot command allows to erase and reflash the partitions of the
+  devices with new images.
+
+* Device has to be in bootloader for the fastboot to work.
+
+=== Fastboot Mode
+
+* Reboot the target device to bootloader mode
+
+----
+$ adb reboot bootloader
+---- 
+
+* Standard mobiles supports pressing `Volume Down + Pwr` keys
+  simultaneously on Power up, to goto fastboot mode.
+
+* Detecting whether device connected through USB is in fastboot mode.
+
+----
+$ fastboot devices
+----
+
+=== Flashing Using Fastboot
+
+* We can erase the flash partition as
+
+----
+$ fastboot erase <partition name>
+---- 
+
+* We can flash the images from the host using
+
+----
+$ fastboot flash <partition name> <image file>
+----
+
+* we can boot the images from the host using
+
+----
+$ fastboot boot <kernel Image> [<ramdisk>]
+----
+
+=== Fastboot for OEM
+
+* The fastboot has few more commands which may be oem specific
+
+* Few oem specific commands, below command enabled the charging screen
+  enabled when your device is charging on power-off state.
+
+----
+$ fastboot oem enable-charger-screen
+----
+
+=== References
+
+* fastboot - https://source.android.com/setup/build/running
+
+* SDK Tools - https://developer.android.com/studio/command-line
+
+* Recovery - https://tektab.com/2015/10/31/android-bootloaderfastboot-mode-and-recovery-mode-explained/
+
+* ADB - https://www.slideshare.net/tetsu.koba/adbandroid-debug-bridge-how-it-works
+
+* Partition Backup -
+  https://forum.xda-developers.com/android/help/adb-fastboot-commands-bootloader-kernel-t3597181
+
+* SDK Setup -
+  https://medium.com/@vsburnett/how-to-set-up-an-android-emulator-in-windows-10-e0a3284b5f94
+
+* Fastoot OEM -
+  https://www.xda-developers.com/how-to-discover-hidden-fastboot-commands/
