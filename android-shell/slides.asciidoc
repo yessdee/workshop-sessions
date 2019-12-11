@@ -1,0 +1,818 @@
+= Using Shell
+
+== Shell 
+
+=== Need for Shell
+  * A shell is a command line equivalent of the start menu and the
+    file browser in M$ Windows. A shell provides a means for
+    navigating through the file system, and launching other programs
+    on request.
+
+  * So called because it provides an interface through which the
+    facilities of an operating system is accessed.
+
+  * The original shell found in Unix system was the Bourne shell.
+
+  * The default shell of a GNU/Linux system is `bash`. `bash` stands
+    for Bourne Again Shell and is a enhanced implementation of the
+    Bourne shell.
+
+  * The default shell of Android is `mksh`. 
+
+=== Uses of Shell
+
+  * The shell prompt is a indication to the user that the system is
+    ready to accept commands. The shell prompt also provides other
+    information like user-name, hostname and the current working
+    directory. The shell prompt usually ends with a `$` character.
+
+  * Just as in M$ Windows, in a GNU/Linux system, data is organised in
+    files and directories.
+
+  * After login, the current directory is set to the home directory of
+    the user. The home directory is GNU/Linux equivalent of a user's
+    "Desktop" folder of a M$ Windows system. Users can store their
+    personal files and directories within their home directory.
+
+  * Files within the current directory can be referred to by
+    specifying the filename alone. Files in other directory have to be
+    specified using a path to the file. More on this in the next
+    session.
+
+=== Commands - Kick Start
+
+
+ * `ls` command is used to list the contents of a directory.
+ 
+ * `cat` command can be used the view the contents of a text file.
+
+.Try out
+
+  * Type `ls`, list contents of current directory.
+  * Type `cat fruits.txt`, prints the contents of fruits.
+  * Type `cat -n fruits.txt`, prints the file contents with a line
+    number prefix.
+
+=== Shell Commands Syntax
+
+
+  * General format of a shell command
+
+------
+command options arguments
+------
+
+  * Example with command to list contents of `.zip` file, is given
+    below. Here unzip is the command. Usually unzip is used to extract
+    the contents of a `.zip` file. But here we use the `-l` option to
+    indicate that instead of extracting the contents, we would like to
+    list the contents of the `.zip` file. The file to be unzipped
+    `image.zip` is the argument for the command.
+
+------
+$ unzip -l image.zip
+------
+
+  * Option modifies the behaviour of the command. An option starts
+    with a single hyphen and is followed by a single character. More
+    descriptive options start with two hyphens followed by the option
+    word.
+
+=== Multiple Arguments 
+
+------
+$ rm --interactive file1 file2 file3
+------
+
+  * Argument specifies the files or values that is to be acted upon.
+
+  * Note the space between command, options and arguments. The space
+    is required for the shell to differentiate the commands, options
+    and arguments from each other.
+
+  * One another thing to be noted is that Unix is case
+    sensitive. Commands, filenames and almost everything else have to
+    be typed in the appropriate case. `Myfile.txt`, `myfile.txt` and
+    `MYFILE.TXT` are all different.
+
+=== Commands for Directories 
+
+  * Some commonly used commands within the shell are given below. The
+    DOS and M$ Windows equivalents are also provided.
+
+.Creating a Directory
+  * DOS: `mkdir myfolder`
+  * Windows: In File Browser, right click and select `New Folder`
+  * GNU/Linux: `mkdir myfolder`
+
+.Try Out
+
+  * Type `mkdir science` and create a new directory.
+  * Type `ls` to list the newly created directory.
+
+=== Commands for Directories 
+
+.Entering a Directory
+  * DOS: `cd myfolder`
+  * Windows: In File Browser, double click on `myfolder` icon.
+  * GNU/Linux: `cd myfolder`
+
+.Try Out
+  * Type `cd science` and enter the directory.
+  * Type `mkdir biology physics chemistry` to create three directories.
+  * Type `cd biology` to enter the directory.
+  * Type `mkdir botany zoology`.
+  * Type `cd botany` to enter the botany directory.
+
+=== Knowing the current working directory
+
+  * DOS: `cd`
+  * Windows: Displayed in the Address Bar of the File Browser
+  * GNU/Linux: `pwd`
+
+=== File Path
+
+.Path Names
+  * The file name along with the parent directories right up to the top
+    most directory is called the absolute path name.
+  * The directories are separated by `/` character.
+  * Note that Windows uses `\` as the directory separator.
+  * Also the path names in GNU/Linux does not contain a drive
+    letter. More on this in the next session.
+  * The home directory of a user is `/home/xxx`. Where `xxx` is the
+    user's username.
+
+.Try Out
+  * Type `pwd` to display the current working directory. It should be
+    something like `/home/xxx/science/biology/botany`
+  * Which says that you are the directory `botany`, which is in
+    `biology`, which in turn is in `science`, and so on.
+
+=== Moving to parent directory
+  * DOS: `cd..`
+  * Windows: Click on the `Up` icon in the File Browser toolbar.
+  * GNU/Linux: `cd ..` (Note the space between `cd` and `..`) The `..`
+    is an alias for parent directory.
+
+.Try Out
+  * Type `cd ..` 
+  * Type `pwd`, the command displays `/home/xxx/science/biology`
+  * Type `cd ..`
+  * Type `pwd`, the command displays `/home/xxx/science`
+  * Type `cd ..`
+  * Type `pwd`, the command displays `/home/xxx`
+
+=== Moving to home directory
+  * GNU/Linux: `cd`
+
+.Try Out
+  * Type `cd science/biology/zoology`, the command changes current
+    working directory to `zoology`.
+
+  * Type `cd`, the command changes current working directory to home
+    directory.
+
+  * Type `pwd` to confirm.
+
+=== Copying File
+
+.Copying a File
+  * DOS: `copy source.txt dest-folder`
+  * Windows: Copy source.txt. Goto dest-folder. Paste.
+  * GNU/Linux: `cp source.txt dest-folder`
+
+.Try Out
+  * Type `cp original.txt copy-1.txt`, to create a copy of
+    `original.txt`
+  * Type `ls`, to check if the new file has been created.
+  * Type `cat copy-1.txt`, to check if the contents are sames as that
+    of `original.txt`.
+
+=== Removing File
+
+.Removing a File
+  * DOS: `del myfile.txt`
+  * Windows: Click and select `myfile.txt`. Press `DEL` key.
+  * GNU/Linux: `rm myfile.txt`
+
+.Try Out
+  * Type `rm copy-1.txt`, to remove the copied file.
+  * Type `ls`, to check if `copy-1.txt` has been deleted.
+
+=== Removing File
+
+.Removing Multiple Files
+  * Windows: Press Ctrl. Click and select files. Press `DEL` key.
+  * GNU/Linux: `rm file1.txt file2.txt file3.txt`
+
+.Try Out
+  * Type `cp original.txt copy-1.txt`, to create the a new copy.
+  * Type `cp original.txt copy-2.txt`, to create another copy.
+  * Type `cp original.txt copy-3.txt`, to create yet another copy.
+  * Type `ls`, to verify that the new files have been created.
+  * Type `rm copy-1.txt copy-2.txt copy-3.txt`, to delete all the three files.
+  * Type `ls`, to verify that the files have been deleted.
+
+=== Command History
+
+.Tip: Command History
+******
+For the sake of convenience, `bash` remembers previously typed
+commands. To invoke the previously typed command press the up
+arrow. For the other commands, the command history can be navigated
+using the up arrow and down arrow keys.
+******
+
+.Copying a Directory
+  * Windows: Same as copying a file.
+  * GNU/Linux: `cp -r myfolder dest-folder`
+
+.Try Out
+  * Type `cp -r science science-bak` to create a backup of the `science` directory.
+  * Type `ls science-bak` to verify.
+
+=== Removing Directory
+
+.Removing a Directory
+  * Windows: Click and select `myfolder`. Press `DEL` key.
+  * GNU/Linux: `rm -r myfolder` The option `-r` specifies that the
+    command should act recursively on all files and directories within
+    `myfolder`.
+
+.Try Out
+  * Type `rm -r science` to remove the science directory.
+  * Type `cp -r science-bak science` to restore from backup.
+  
+=== Moving a File or Directory
+  * DOS: `move source.txt dest-folder`
+  * Windows: Cut source.txt. Goto dest-folder. Paste.
+  * GNU/Linux: `mv source.txt dest-folder`. 
+
+.Try Out
+  * Type `mkdir computer-science`, to create a directory called `computer-science`.
+  * Type `mv computer-science science`, to move the directory into the
+    `science` folder.
+
+=== Viewing files
+
+  * The contents of a file can be dumped to the screen using the `cat`
+    command.
+
+.Try Out
+
+  * Type `cat elements.txt`.
+
+.Using More
+
+  * But, if the no. of lines in the file exceeds the screen height,
+    the `more` command be used to view one screen full of text at a
+    time.
+
+.Try Out
+
+  * Type `more elements.txt`, to view the file.
+  * Type `Spacebar`, to view the next page of text.
+  * Type `q`, to quit viewing.
+
+=== Scrolling Through File
+
+.Using Less
+
+  * The `less` command is more flexible than `more`, and can be used
+    to browse and search the file.
+
+  * The following keystrokes can be used within `less`:
+    - `Arrow` keys - scroll though the text
+    - `q` - quit
+    - `/stringRETURN` - search for STRING
+    - `n` - goto next match forwards
+    - `N` - goto next match backwards
+
+=== Scrolling File - Try Out
+
+  * Type `less elements.txt`, to view the file.
+  * Use arrows to scroll through the file.
+
+  * Type `/gen`, to search for the word `gen`. `less` highlights the
+    occurrences of the words, and scrolls to the first match in the
+    forward direction.
+
+  * Type `n`, to goto next match.
+  * Type `N`, to goto previous match.
+  * Type `q`, to quit
+
+=== Helper Keystrokes 
+
+.Tip: Command Editing 
+******
+The right arrow, left arrow, delete and backspace keys can be used to
+move the cursor and edit a command.
+
+The `Ctrl-a` key moves cursor to start of line and `Ctrl-e` moves
+cursor to end of line.
+
+Long filenames can be easily completed using the `Tab` key. Type the
+prefix of the filename and press Tab to complete.
+******
+
+=== Working with Multiple Files
+
+  * Many commands accept multiple filenames as argument. Examples: `ls`,
+    `rm`, `cp`, etc.
+
+  * If the no. of files to be processed is less, the individual names
+    can be typed.
+
+  * But if there are too many files to be processed then wild card
+    characters can be used to select multiple files.
+
+  * Multiple files are selected by identifying patterns in the
+    filename. For example you could say copy all files whose filename
+    starts with `a`, or delete all files who's filename ends with
+    `.txt`. To achieve this the `*` wild-card character can be
+    used. 
+
+  * The `*` wild card character is used to match any character, zero
+    or more times.
+
+=== Wildcards  Try Out
+
+  * The dir. `pattern` contains files that can be used for practising
+    pattern matching.
+  * Type `cd` to go to the home directory.
+  * Type `cp -r pattern pattern-bak`, to make a backup copy.
+  * Type `cd pattern` to go to the pattern directory.
+  * Type `rm a*`, to remove files starting with `a`.
+  * Type `rm *1.txt`, to remove files ending with `1.txt`.
+  * Type `rm doc*.txt`, to remove file starting with `doc` and ending
+    with `.txt`.
+
+=== Wildcards  Try Out II
+ 
+  * Type `rm *`, to remove all files.
+  * Type `cd` to goto home directory.
+  * Type `rm -r pattern` to remove `pattern` directory.
+  * Type `cp -r pattern-bak pattern` to restore the `pattern` directory.
+
+=== Matching Only Once
+
+  * The `?` wild card character is used to match any character, only
+    once.
+
+.Try Out
+
+  * Type `cd` to goto home directory.
+  * Type `rm b?.txt`, to remove files that start with `b`, have a single
+    character after that and ends with a `.txt`.
+  * Type `rm b??.txt`, to remove files that start with `b`, have any
+    two characters after that and ends with a `.txt`.
+  * Type `rm ??`, to remove files that exactly two character in the
+    filename.
+
+
+== Processes
+
+=== Processes
+
+  * Process is a program in execution.
+  * A process is always created by another process.
+  * When process X creates a new process Y, X is called the parent of Y.
+  * Each process is given a unique number called the process ID. The
+    processes can be referred to using the process ID.
+  * `init` is the first program to be executed, and hence the first
+    process. It has process ID of 1.
+  * The first user process, is usually the shell.
+
+=== PS Command
+
+Listing Processes
+
+  * The `ps` command is used to list processes.
++
+------
+<1>   <2>             <3>   <4>
+  PID TTY          TIME CMD
+ 6423 tty1     00:00:00 bash
+ 6457 tty1     00:00:00 ps
+------
+<1> The process ID of the task.
+<2> The terminal associated with the task.
+<3> The total CPU time used by the process
+<4> Command used to start the process.
+
+  * Without arguments, the `ps` command lists processes started by the
+    user in the current terminal.
+
+=== PS Options
+
+  * The command to list all processes in the system the `-A` option
+    can be used as shown below.
+
+------
+$ ps -A
+------
+
+  * There options for filtering processes for filtering processes
+    based on user, command, and process ID.
+
+    - `ps -U <username-list>`
+    - `ps -C <command-list>`
+    - `ps -p <pid-list>`
+
+  * The parent child relation ship of processes can be displayed as
+    tree, using the `pstree` command.
+
+.Try Out
+  * List all processes belonging to `root`.
+  * List all processes corresponding to the program `getty`.
+  * List the process tree of the system.
+
+=== Resource Utilisation
+
+  * The `top` command can be used to watch the resource utilisation of
+    processes.
+
+  * The `top` command is a full screen application. `top` displays,
+    one screen full of processes and their information. Some of
+    important fields are listed below
+
+    - `PR` - priority of the process
+    - `VIRT` - the amount of virtual memory used by the task
+    - `RES` - the amount of physical memory used by the task
+    - `SHR` - the amount of shared memory used by the task
+    - `S` - the state of the process
+    - `%CPU` - the task's share of the elapsed CPU time since the last
+      screen update
+    - `%MEM` - the task's currently used share of available physical
+      memory.
+
+=== Top Keystrokes
+
+  * Key strokes within `top`.
+    - `M` key stroke - Sort on memory usage
+    - `P` key stroke - Sort on CPU usage
+    - `q` key stroke - quit
+
+.Try Out
+
+  * Find out the process that occupies the greatest amount of memory
+    in the system.
+  * Find out the process that uses the CPU the most.
+
+=== Job Control
+
+  * Shell does not provide prompt till the last entered command is
+    completed. Further commands cannot be entered till the previous
+    command completes execution.
+
+  * If this behaviour is not desired, the program can be run in the
+    background: `cmd &`
+
+  * Each command entered in the shell is given a job no. When a
+    command is executed in the background the shell prints the shell
+    prints the job no. and the process id. 
+
+------
+$ sleep 10 &
+[1] 11274
+------
+
+=== Backgrounding a Task
+
+  * Sometime it is required to background, a command that has already
+    been started. This can be achieved by first stopping the job using
+    `Ctrl-Z`, and then running `bg <job-no>`.
+
+  * Stopping a job freezes its execution, no instructions in the
+    program are executed, till the process is continued, for example
+    by the `bg` command.
+
+------
+$ sleep 10
+^Z
+[1]+ Stopped 
+$ bg %1
+[1]+ sleep 10 &
+------
+
+=== Listing Jobs
+
+  * Usually job numbers are prefixed by a percentage character.
+
+  * We could end up with lots of stopped jobs, or jobs running in the
+    background. In case we would like to know what jobs are stopped or
+    running in the background, the `jobs` command can be used.
+
+  * A stopped job or a background-ed job can be brought to foreground
+    using `fg <job-no>`.
+
+=== Termination
+
+  * The job running in the foreground, can be immediately terminated
+    using the `Ctrl-C` key stroke.
+
+  * Processes running in the background or in other terminals can be
+    terminated using, the `kill` command. The command can be invoked
+    as `kill <pid>` or `kill <job-no>`.
+
+  * Processes can also be killed by specifying the command name they
+    were started with. But since there could be more than one
+    processes started with the same command name, this could
+    potentially kill more than one process. The command to terminate
+    processes by command name is `killall` and the general syntax is
+    `killall <command-name>`
+
+=== Process - Try Out
+
+  . Suspend and resume process
+    * Start `top`.
+    * Press Ctrl-Z to suspend `top` 
+    * Resume `top` in the foreground.
+  . Suspend and background process
+    * Make a copy of `/usr/bin/xxx` to your home directory.
+    * Press Ctrl-Z during the copy, to suspend the copy.
+    * Resume the command in the background.
+  . Run in background
+    * Make a copy of `/usr/bin/xxx` in the background.
+  . Killing processes
+    * Start multiple copies in the background.
+    * Kill a copy process with the kill command.
+    * Check the file size to verify that the copy command terminated.
+
+=== I/O Redirection
+
+  * Programs usually produce some output. By default the output goes
+    to the terminal.
+
+  * The output can be saved to file by using the output redirection
+    operator `>`. The following example, stores the output of `ls` to
+    `myfile`.
+
+------
+$ ls > myfile
+------
+
+  * Note that, when the output is redirected to a file, the original
+    contents of the file will be lost.
+
+=== Append 
+
+  * If instead the output should be appended to the existing contents
+    of the file the `>>` redirection operator can be used.
+
+  * Apart from regular output, a command can print errors.
+
+  * To redirect errors prefix the output redirection operator with `2`
+    as `2>` and `2>>`.
+
+.Try Out
+  * Store the output of `pstree` to a file.
+  * Perform a file copy using the `cat` command and redirection
+    operators.
+  * Switch to the home directory.
+  * Join the 3 files `elements1.txt`, `elements2,txt`, `elements3.txt`
+    into a single file using a single `cat` command and the
+    redirection operator.
+  * Join the 3 files using multiple `cat` commands and the redirection
+    with append operator.
+
+=== Shell Variables
+
+  * Used to store information in memory for later use by the user or
+    the shell.
+  * To set the value of variable
+
+------
+$ myvar=value
+------
+
+  * Note that there is no space around the `=` sign.
+  * To retreive the value of the variable prefix the variable name
+    with a `$` sign.
+
+------
+$ myvar2=$myvar1
+------
+
+=== Echo
+
+  * The `echo` command is used to print the string passed as
+    arguments.
+
+  * To view the value of a variable, the `echo` command can be used.
+
+------
+$ echo $myvar
+------
+
+  * TAB completion also works with shell variables, in `bash`.
+  * The values of the variables are stored internally as a string of
+    characters.
+  * There are no integer variables.
+  * The variables are not preserved across re-boots.
+
+.Try Out
+
+  * Store the string `/usr/share/iceweasel/icons` in a variable `icons`
+  * List the contents of the directory using the variable.
+  * Copy the contents of the directory to `/tmp` using the variable.
+
+=== Quoting
+
+  * Certain characters have special meaning to the shell, like `*`,
+    `?`, `>`, `&`, `$`, etc.
+
+  * If a command contains these characters they will be specially
+    interpreted by the shell.
+
+  * Quoting can be used to prevent the special interpretation of these
+    characters.
+
+=== Quoting a Single Character
+
+  * To remove the special meaning of single character, prefix the
+    character by a `\`.
+
+  * Example to copy a file called `m&n`, the following command can be
+    used.
+
+------
+$ cp m\&n.txt /tmp
+------
+
+=== Quoting a String of Characters
+
+  * To prevent the shell from interpreting special characters in a
+    string of characters, surround the string by a single quote.
+
+  * The above example can be repeated with a single quote.
+
+------
+$ cp 'm&n.txt' /tmp
+------
+
+  * The double quotes is similar to single quote, except that `$`
+    retains its special meaning.
+
+  * To copy a file called `m&n-1.txt`, the following command can be
+    used.
+
+------
+$ i=1
+$ cp "m&n-$i.txt" /tmp
+------
+
+=== Quoting - Try Out
+
+  * The directory `quoted` in the home directory contains files with
+    special characters.
+
+  * Try copying each file to the directory `slash`, using the `\` quote.
+  * Try copying each file to the directory `single`, using the `'` quote.
+  * Try copying each file to the directory `double`, using the `"` quote.
+
+=== Special Shell Variables
+
+.`PATH`
+
+Specifies a list of directories in which the shell should look for
+commands. The directories are separated by a `:`.
+
+------
+$ echo $PATH
+/usr/local/bin:/bin:/usr/bin
+------
+
+When the user types `ls` in the command line, the shell looks for `ls`
+in `/usr/local/bin`, `/bin` and `/usr/bin`. The first match is
+executed.
+
+To add a directory to existing list of directories, the following
+command can be used.
+
+------
+$ PATH=$PATH:/path/to/new/directory <1>
+$ PATH=/path/to/new/directory:$PATH <2>
+------
+
+<1> The directory is added to the end of the list.
+<2> The directory is added to the start of the list.
+
+Note that the directory added to `PATH` should be an absolute path.
+
+=== Path - Try Out
+
+  * Take a backup of your original `PATH` using
+
+------
+BPATH=$PATH
+------
+
+  * There are two binaries `ls` and `hello` in `~/mybin`
+  * From some other directory invoke `hello`, the command will fail.
+  * Add the directory `mybin` to the end of `PATH`
+  * Invoke `ls` and `hello`.
+  * Add the directory `mybin` to the beginning of `PATH`.
+  * Invoke `ls` and `hello`.
+  * Restore your original `PATH`.
+
+------
+PATH=$BPATH
+------
+
+=== Scripting
+
+  * Hello World
+
+. Hello world script
+------
+#!/bin/sh <1>
+
+echo "Hello World" <2>
+------
+
+<1> Sha bang sequence
+<2> Shell command
+
+  * Making it executable
+
+------
+chmod +x hello.sh
+------
+
+  * Executing a shell script
+
+------
+$ ./hello.sh
+------
+
+=== Scripting - Try Out
+
+  * Create a Hello World shell script.
+
+.Beyond Hello World
+
+  . A script to create a backup of a directory
+
+.Backup script
+------
+#!/bin/sh
+                     <1>
+zipfile="/tmp/backup-$(date +%d%m%y).zip" <2>
+backdir="/home/user/projects/smash"
+
+zip -r $zipfile $backdir <3>
+------
+
+<1> The `$()` performs command substitution. The command is replaced
+by the commands output.
+
+<2> The `date` command displays the current date in the specified
+format.
+
+<3> The `zip` command is used create a ZIP file. The `-r` option
+specifies that directories are to be zipped recursively.
+
+=== Looping Constructs
+
+  * The `for` statement executes the loop body once for each item in
+    the list specified after `in`.
+
+  * The body for the `for` loop is enclosed between `do` and `done`.
+
+.`for` loop sample
+------
+for x in 1 2 3
+do
+echo Hello $x
+done
+------
+
+.Sample code output
+------
+Hello 1
+Hello 2
+Hello 3
+------
+
+=== Further Reading
+
+
+  * Introduction to Linux: Processes: Processes inside out - 
+    http://www.tldp.org/LDP/intro-linux/html/sect_04_01.html
+
+  * Bash Reference Manual: Bash Features: Job Control -
+    http://www.gnu.org/software/bash/manual/html_node/Job-Control.html#Job-Control
+
+  * FreeBSD Handbook: Unix Bascis: Processes and Daemons -
+    http://www.freebsd.org/doc/handbook/basics-processes.html
+
+  * Debian Reference: GNU/Linux tutorials: Unix-like text processing -
+    http://www.debian.org/doc/manuals/reference/ch-tutorial.en.html
+
+  * Bash Programming - Introduction HOWTO
+    http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO.html
+
+  * An Introduction to the Unix Shell by Steve Bourne. The author of
+    the original bourne shell. http://partmaps.org/era/unix/shell.html
+
