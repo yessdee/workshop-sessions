@@ -1,0 +1,429 @@
+= Android Filesystems
+
+== Filesystem
+
+== Need for a Filesystem
+
+=== Without Filesystems
+
+image::figures/no-fs-1.png[width="50%",align="center"]
+
+=== Without Filesystems
+
+image::figures/no-fs-2.png[width="50%",align="center"]
+
+=== Without Filesystems
+
+image::figures/no-fs-3.png[width="50%",align="center"]
+
+=== Problems
+    
+  * User has to remember the sectors that store the contents of a file.
+
+  * The user also has to keep track of which sectors are free.
+
+  * Managing files becomes tedious.
+
+=== Solution
+
+image::figures/fat.png[width="50%",align="center"]
+
+=== Unix Filesystems
+
+  * In Unix/Linux systems the table is called the inode table.
+
+
+  * The inode table, contains the file meta information, like the 
+    
+    - filetype, permissions, ownership, access time, modifiction time,
+      etc.
+
+  * Filesystem has superblocks which maintain used and unused location
+    entries
+
+  * When you format these entries are created.
+
+=== File System Formats
+
+  * There are various ways of storing files and meta information about
+    the files in the storage medium.
+
+  * The various different filesystem formats are listed below
+
+    - EXT2, EXT3, EXT4 - defacto filesystem in Linux
+    - Btrfs - designed to replace EXT filesystem in Linux, with advance filesystem features
+    - NTFS - defacto filesystem in Windows
+    - FAT - defacto filesystem in MS-DOS
+    - ISO9660 - designed for CD-ROMs
+
+
+=== Storage Stack
+image::figures/storage-stack.png[width="20%",align="center"]
+
+=== Storage Stack
+
+  * When the application has to retrieve a file, it asks the file
+    system layer.
+
+  * The file system layer looks into its inode table, and determines
+    the sectors in which the file is present.
+
+  * The file system layer then asks the block driver to retreive the
+    sectors.
+
+  * The block driver instructs the hardware to retreive the sectors.
+
+  * The retreived sectors are then propagated up the stack.
+
+=== Mounting
+
+  * Mounting is a two step process.
+
+  * Mounting associates a block device with a filesystem driver.
+
+  * The external filesystem is then attatched to the existing
+    filesystem tree at the mount point.
+
+  * The general syntax of the mount command is given below.
+
+------
+mount -t <fs> <block-device> <mount-point>
+------
+
+
+=== Mounting 
+
+  * The currently mounted filesystems can be viewed by invoking the
+    mount command without arguments.
+
+
+------
+mount
+------
+
+  * A mounted filesystem can be unmounted using the `umount` command.
+
+------
+umount <mount-point>
+------
+
+=== Accessing Hard Disks
+
+  * The storage stack when using the hard disk with an ext2
+    filesystem.
+
+  * The ext2 filesystem can be created on the hard disk using
+    `mkfs.ext2` command.
++
+------
+$ mkfs.ext2 /dev/sda1 
+------
++
+  * The filesystem can be mounted using the `mount` command.
++
+------
+$ mount /dev/sda1 /mnt/hd
+------
+
+=== Harddisk Ext2 Layers
+
+image::figures/hardisk-ext2.png[width="20%",align="center"]
+
+
+=== Ramdisk
+
+image::figures/ramdisk-ext2.png[width="20%%",align="center"]
+
+=== Using Ramdisks
+
+  * The Ramdisk block driver treats a portion of the RAM as a storage
+    area.
+
+  * The storage stack when using the ramdisk with an ext2 filesystem.
+
+  * The device file that corresponds to the ramdisk is `/dev/ram0`.
+
+  * The filesystem can be created and mounted as in the case of the
+    hard disk.
+
+  * The contents of the ramdisk are lost after a system reboot.
+
+=== Storage Types
+
+* Raw NAND
+  - No Partition Table
+  - No Wear Leveling
+  - Needs Flash Aware Filesystem
+
+* Managed NAND
+  - SD, Pendrive, SSD
+  - Flash Translation Layer
+  - Simulated closed to Harddisk  
+  - Harddisk Filesystems Works
+
+=== Root Filesystem Hierarchy
+
+----
+
+/
+ |-sbin
+ |-system/bin/
+ |-system/etc
+ |-proc
+ |-sys
+ |-dev
+ |-data
+     |-cache
+     |-local
+         |-tmp
+ |-vendor
+ |-mnt
+ |-persist
+
+----
+
+== Pseudo Filesystems 
+
+=== Intro
+
+* They are not stored in disk
+
+* They are live values from the kernel
+
+* kernel data abstracted in filesystem
+
+
+=== Proc
+
+  * *procfs* was designed to keep process related information.
+
+  * Eventually got added with lot of non-process information.
+
+  * Examples:
+	** `/proc/net/packet`
+   	** `/proc/net/wireless`
+	** `/proc/asound/cards`
+ 
+  * Mounting proc file-system
+
+------
+$ mount -t proc none /proc
+------
+
+=== Sys
+
+  * An in-memory filesystem that exports device information from
+    kernel
+
+  * Acts like device manager of Windows
+
+  * Exports Kernel datastructures, their attributes and relationships.
+
+  * Examples: network, filesystems, hardware, drivers, memory.
+
+  * Mounting sysfs file-system
+
+------
+$ mount -t sysfs none /sys
+------
+
+=== Dev
+
+  * Automatically creates device nodes
+
+  * Mounting devtmpfs file-system
+
+------
+$ mount -t devtmpfs none /dev
+------
+
+=== Tmp
+
+  * Creates filesystem on RAM, where temporary files can be accessed
+    faster than Disk.
+
+  * Data is lost when system is powered-off
+
+  * Mounting tmpfs file-system
+
+------
+$ mount -t tmpfs -o size=2m none /my/mnt/point
+------
+
+== Automount
+
+=== FSTAB
+
+* On boot up all the filesystems are automatically mounted.
+
+* fstab is filesystem mount table, which contains which partitions in
+  the disk has to be mounted on what location.
+
+
+=== VOLD for external storage automount
+
+* Volume Daemon supports automounting
+
+* Listen for new storage device detection like sdcard or pendrive.
+
+* automounts them by checking the filesystem and storage type.
+
+* Notifies to application layer about device detection.
+
+* helps to manage detection, formatting and mounting of devices.
+
+== AOSP Partitions
+
+=== OS
+
+* boot
+  - kernel with concatenated DTB and ramdisk
+  - kernel and rootfs are combined using mkbootfs.
+
+* system
+  - framework components
+  - should yaffs2 if Raw NAND is used
+  - ext4 or f2fs for Managed NAND (eMMC/SD) 
+
+* vendor/oem/odm
+  - contains vendor specific data that cannot be added to AOSP.
+
+=== Application
+
+* data
+  - user installed applications and customizations
+  
+* cache
+  - caches the temporary data of all the applications
+
+=== Recovery and Verification
+
+* recovery
+  - recovery image which used for Over the Air Upgrades.
+
+* misc
+  - it is used by recovery in case required. 
+
+* metadata
+  - it is used when device is encrypted. 
+
+=== Supplementary Partitions
+
+* radio
+  - radio image, which is image for baseband modems.
+
+* tos
+  - stores partition image of the trusted OS.
+
+=== SoC Specific Partitions
+
+* EFS                          - UEFi Boot
+
+* MODEMST1, MODEMST2           - Modem Firmware
+
+* FSG(File system Golden Copy) - Modem Firmware for OTA
+
+* FSC(File System Copy)        - Modem Firmware for OTA
+
+=== A/B Partition
+
+* To Support Over the Air Updates there would be two partitions for
+  each Image A and B
+
+* If we perform OTA, B partition would be erased and update with new
+  firmware.
+
+* Switch B partion and checks whether they work properly.
+
+* if issue switch back to A and continue the system working.
+
+=== Tryouts
+
+* Use adb shell 
+
+* To check process related information
+----
+$ ls /proc/filesystems	
+---- 
+
+* To check device related information
+----
+$ ls /sys/class/net
+----
+
+* To check device related information
+----
+$ ls /dev/mmc*
+----
+
+=== Tryouts on Partitions
+
+* To check mounted partition and their filesystem type
+
+----
+$ mount
+----
+
+* To check the mounted partition and its size
+
+----
+$ df -h
+----
+
+* To check mounted and unmounted partitions
+
+----
+$ cat /proc/partitions
+----
+
+* To check the partition names
+
+----
+$ ls /dev/block/platform/soc/c0c4000.sdhci/by-name/
+----
+
+=== Tryouts on Hierarchy
+
+* Look at root
+----
+$ ls /
+----
+
+* Look at system
+
+----
+$ ls /system
+----
+
+* Look at data
+
+----
+$ ls /data
+----
+
+=== Tryouts on Flashing using Fastboot
+
+* Reboot to Fastboot Mode 
+
+----
+$ adb reboot bootloader
+----
+
+* Boot through recovery.img
+
+----
+$ fastboot boot recovery.img
+----
+
+=== References
+
+* Android Partitions -
+  https://wiki.z3x-team.com/index.php?title=ANDROID_DEVICE_PARTITIONS_and_FILESYSTEMS
+
+* Fastboot -
+  https://forum.xda-developers.com/android/help/adb-fastboot-commands-bootloader-kernel-t3597181
+
+* Flashing Dragon Board 
+  - https://github.com/96boards/documentation/blob/master/consumer/dragonboard/dragonboard845c/installation/linux-fastboot.md
+  - https://www.96boards.org/documentation/consumer/dragonboard/dragonboard410c/guides/customize-emmc-partition.md.html
+  - https://git.linaro.org/landing-teams/working/qualcomm/db-boot-tools.git/tree/dragonboard410c/linux/flashall
