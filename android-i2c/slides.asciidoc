@@ -1,0 +1,88 @@
+= Testing I2C
+
+== I2C in Linux
+
+=== File interface
+
+  * In Linux, I2C Bus can be accessed like a file.
+
+  * It can be accessed using a dev interface, `/dec/i2c-<bus no.>`.
+
+  * Doing fileio operations on this device file, will be reflected as
+    send and receive transactions in the bus.
+
+
+
+=== Linux I2C Software Stack
+
+image::figures/i2c-linux.png[width="640",align="center"]
+
+== I2C Detection
+
+=== Viewing Adapters in Sysfs
+
+  * Each I2C bus in the system is identified by a unique no. The I2C
+    Controllers and their unique no. can be obtained from sysfs 
+
+[source,sh]
+----
+ls /sys/class/i2c-dev/
+----
+
+=== Debugging I2C Using I2C Tools
+
+  * `i2ctools` set of tools to access I2C in linux.
+
+  * `i2cdetect` provides the list of device addresses, connected in
+    the bus.
+
+[source,sh]
+----
+$ i2cdetect -y -l
+$ i2cdetect -y 0
+----
+
+=== Reading and Writing Registers
+
+* we can read the regiser value as
+
+----
+$ ./i2cget -y 6 0x58 0x00
+----
+  - busno    - 6
+  - slaveid  - 0x58
+  - register - 0x0
+ 
+* We can write value to register as
+
+----
+$ ./i2cset -y 6 0x58 0x1 0x1
+----
+
+=== Sample DTS For I2C
+
+----
+i2c@f9967000 {
+	status = "okay";
+	clock-frequency = <200000>;
+	pinctrl-0 = <&i2c11_pins>;
+	pinctrl-names = "default";
+
+	eeprom@52 {
+		compatible = "atmel,24c128";
+		reg = <0x52>;
+		pagesize = <32>;
+		read-only;
+	};
+
+	ikeypad@30 {
+    		compatible = "ikeypad";
+    		reg = <0x30>;
+    		interrupts-extended = <&gpio 19 IRQ_TYPE_EDGE_RISING>;
+};
+
+
+		};
+	};
+
+----
