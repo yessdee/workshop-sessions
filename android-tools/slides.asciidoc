@@ -104,6 +104,17 @@ image::figures/setup.png[]
 
 * We can download install and update the packages, to get the tools.
 
+----
+
+$sdkmanager "platform-tools" "platforms;android-28"
+
+$sdkmanager "system-images;android-28;google_apis;x86"
+
+$sdkmanager --license
+---- 
+
+=== Tools Insallation in Linux
+
 * In Linux(Ubuntu), SDK Platform Tools(adb) can be installed using
   package manager.
 
@@ -126,6 +137,14 @@ $ sudo apt-get install android-tools-adb android-tools-fastboot
 * else if target had boot till bootloader, it can be interacted with
   `fastboot` protocol.
 
+=== Serial Communication
+
+  * Generally Bootloaders and Kernel Log can be perceived using serial
+  console.
+
+  * Host system uses a serial terminal program like `minicom` and
+    `putty` to communicate with the target system.
+
 === ADB 
 
 * Android Debug Bridge(ADB) is Host to Target communication interface
@@ -144,7 +163,7 @@ $ sudo apt-get install android-tools-adb android-tools-fastboot
 
 === ADB Architecture
 
-image::figures/adb-setup.png[align="center", width=600]
+image::figures/adb-setup.png[align="center", width=800]
 
 
 === ADB for File Transfer
@@ -271,5 +290,7 @@ $ fastboot oem enable-charger-screen
 * SDK Setup -
   https://medium.com/@vsburnett/how-to-set-up-an-android-emulator-in-windows-10-e0a3284b5f94
 
-* Fastoot OEM -
+* Fastboot OEM -
   https://www.xda-developers.com/how-to-discover-hidden-fastboot-commands/
+
+
