@@ -1,0 +1,225 @@
+= Testing GPIO
+
+== GPIO
+
+[style="two-column"]
+=== GPIO Controller
+
+[style="left"]
+* GPIO controller is the hardware which provides register interface
+  using which the pin status can be accessed.
+
+* GPIO controller resides in the memory bus of the SOC.
+
+[style="right"]
+image::figures/gpio-arm.png[]
+
+
+=== GPIO Direction
+
+ * It can operate in both the directions, as an `input` to sample the
+   logic level or as an `output` to drive any logic level
+
+ * Their direction as input or output can be chosen.
+
+ * The pin status can be read or modified from software.
+
+=== GPIO Ports and Pins
+
+ * The GPIO controllers are also called GPIO ports.
+
+ * A GPIO ports, controls a set of GPIO pins
+
+ * GPIOs pins are referred as, particular pin in a particular port
+ 
+ * Example: P2_3 - pin 3 in port 2
+
+
+=== GPIO Usage in ZKit-ARM-VF51
+
+[options="header"]
+|====================================
+| Device | Port Pin | Pin Sequence No
+| TPoint | P0_10     | GPIO10
+| TPoint | P0_11     | GPIO11
+|====================================
+
+== SYSFS GPIO
+
+[role="two-column"]
+=== GPIO Files in Sysfs
+
+[role="left"]
+* Inside `sysfs` in path `/sys/class/gpio` we have files which allows
+  to monitor and control the GPIO.
+
+* For each GPIO a folder `/sys/class/gpio/gpio<no>` is created and it
+  would have below files.
+
+* the `direction` file allows to control direction of pin and `value`
+  file would allow to access the pin state.
+
+[role="right"]
+----
+/sys/class/gpio/
+| -- gpio<no>
+     | -- value
+     ` -- direction 
+----
+
+=== GPIO Request
+
+* GPIOs can be used internally by other kernel subsystems
+
+* GPIO has to be made available to user, by the kernel, before they
+  can be used
+
+* If GPIO is used by kernel, this will fail
+
+----
+$ echo 10 > /sys/class/gpio/export
+----
+
+* You would find `/sys/class/gpio/gpio10` available, if no other
+  peripheral subsystem has not reserved it.
+
+* A GPIO pin can be freed as shown below
+
+----
+$ echo 10 > /sys/class/gpio/unexport
+----
+ 
+=== GPIO Direction
+
+* The processor pin can be configured as output pin by writing 'out'
+to the GPIO direction file
+
+----
+$ echo out > /sys/class/gpio/gpio10/direction
+----
+
+* The processor pin can be configured as output pin by writing 'in' to
+the GPIO direction file
+
+----
+$ echo in > /sys/class/gpio/gpio10/direction
+----
+
+=== GPIO State 
+
+ * When value '1' or '0' written in the value file, it can drive logic
+   level high or low.
+
+----
+$ echo 1 > /sys/class/gpio/gpio10/value
+----
+
+ * The value file can be read to know the state of input pin.
+
+----
+$ cat /sys/class/gpio/gpio10/value
+----
+
+== GPIOs
+
+=== GPIO Controller
+
+  * GPIO: software controlled digital signal
+
+  * Controller Functions:
+    - Change direction - input, output
+    - Read state of pins
+    - Set the state of pins, in case of output
+
+=== `gpiolib` Framework
+
+image::figures/gpio-framework.png[align="center",width="65%"]
+
+=== Example Usage
+
+image::figures/mmc-gpio.png[align="center",width="65%"]
+
+=== GPIOs in Device Trees
+
+  * In device trees, GPIOs are identified using a GPIO specifier
+
+  * Represented as a cell array
+
+    - First cell: GPIO controller phandle
+    - Additional cells: specify GPIO no. and flags
+
+  * Number and meaning of additional cells are specific to GPIO
+    controller
+
+  * Defined in GPIO controller bindings
+
+  * Example GPIO specifier
++
+------
+<&gpio 12 0>
+------
+
+
+[role="two-column"]
+=== GPIO Provider: Device Tree Representation
+
+[role="left"]
+[source,dts]
+-----
+gpio: gpio@40e00000 {
+    compatible = "mrvl,pxa-gpio";
+    reg = <0x40e00000 0x10000>;
+    gpio-controller;
+    #gpio-cells = <0x2>;
+    ...
+};
+-----
+
+[role="right"]
+  * `gpio-controller` boolean property, specifies that the node is a
+    GPIO controller
+
+  * `#gpio-cells` specifies the no. of additional cells, 2 for
+    `mrvl,pxa-gpio`
+
+  * First cell specifies the GPIO number
+
+  * Second cell bitwise-or of
+    - `GPIO_ACTIVE_LOW` or `GPIO_ACTIVE_HIGH`
+    - `GPIO_SINGLE_ENDED` or `GPIO_PUSH_PULL`
+
+[role="two-column"]
+=== GPIO Consumer: Device Tree Representation
+
+[role="left"]
+[source,dts]
+------
+mmc0: mmc@41100000 {
+  compatible = "marvell,pxa-mmc";
+  reg = <0x41100000 0x1000>;
+  interrupts = <23>;
+  ...
+  cd-gpios = <&gpio 12 0>;
+  wp-gpios = <&gpio 13 0>;
+};
+------
+
+[role="right"]
+  * Custom properties to specifiy list of GPIOs
+
+  * Properties are name `<function>-gpios`
+
+  * Older bindings use the name `gpios` and `<function>-gpio`
+
+  * A property, depending on binding, can be used specify one or more
+    GPIOs
+
+
+=== GPIO in Debugfs
+
+* if a GPIO request fails, can be investigated by looking in to the
+  debugfs
+
+----
+$ cat /sys/kernel/debug/gpio
+----
