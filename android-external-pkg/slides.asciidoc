@@ -1,0 +1,128 @@
+= Building Custom Software
+
+== Android Native Layer
+
+=== Native Code
+
+* C/C++ Codes running in android is generally called as native codes.
+
+* To compile the C Code we need compiler.
+
+* Along with compiler we have components like libraries, debuggers
+  etc., We call that as toolchain.
+
+* To compile C code to arm target we need ARM cross toolchain.
+
+=== Android Native Development Kit
+
+* Android provides NDK which has the cross toolchains
+
+* It supports LLVM based toolchain
+
+* Has clang compiler, c++ and c library.
+
+=== Use
+
+* Several high performance applications are built using NDK.
+
+* Games, HAL and other tools can be built with NDK
+
+
+=== Download NDK
+
+* Download the NDK as
+
+----
+$ wget https://dl.google.com/android/repository/android-ndk-r20b-linux-x86_64.zip 
+----
+    
+* Unzip the file as 
+
+----
+$ unzip android-ndk-r20b-linux-x86_64.zip
+----
+
+* Add it to path 
+----
+$ export PATH=$PATH:android-ndk-r20b
+----
+
+=== Fetching Source
+
+* We can download command line tool
+
+----
+$ git clone https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git -b v4.1 i2c-tools 
+----
+
+----
+$ cd 
+----
+=== .mk Files
+
+* Most of the opensource software are not compilable to Android directly.
+
+* We may need to Android.mk and Application.mk
+
+* Android.mk would specify what are the files need to be compiled.
+
+* Application.mk would specify what are the compilation parameters to
+  be passed.
+
+=== Patching
+
+* Any new changes to existing source code is called patching
+
+* We have created a patch which add Android.mk and Application.mk for
+  I2C tools.
+
+* We can apply patch as shown below
+
+----
+$ patch -p2 < ../i2c_tools.patch
+----
+
+=== NDK Build
+
+* We may need to export shell variable `NDK_PROJECT_PATH` to point to
+  our current project path.
+
+----
+$ export NDK_PROJECT_PATH=`pwd`
+----
+
+* we can build the tool as below
+
+----
+$ mkdir myoutput
+$ ndk-build NDK_APPLICATION_MK=./Application.mk NDK_LIBS_OUT=myoutput
+----
+
+=== Pushing the Tools
+
+* myoutput files would have lots of libraries and commands in it.
+
+* we can push them to the target
+
+----
+$ adb push myoutput/* /data/local/tmp/
+----
+
+=== Invoke in the target
+
+* Need the system to look at the libraries which we have built
+
+----
+$ export LD_LIBRARY_PATH=/data/local/tmp 
+
+----
+
+* we can run the command as
+
+----
+$ ./i2cdetect -y 6 
+----
+
+=== References
+
+https://developer.android.com/ndk/guides/other_build_systems
