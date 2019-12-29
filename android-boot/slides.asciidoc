@@ -1,0 +1,204 @@
+= Android Boot
+
+== Problem of Flash
+
+=== Memory Mapped Boot Device
+
+* In earlier days most of the system had Parallel NOR as the boot
+  device.
+
+* Parallel NOR is a memory mapped device, where CPU can fetch
+  instructions directly
+
+* Bootloader flashed exactly at the reset vector, can boot on
+  PowerOnReset.
+
+=== Non-Memory Mapped Boot Device
+
+* When the industry was moving towards the low-cost high capacity
+  storage devices they were finding Raw NAND flash as the solution.
+
+* NAND chips were not memory mapped device, they need to be accessed
+  through special command sequences.
+
+* So there was NAND controllers in SoC which can be used to read from
+  the NAND.
+
+* So the CPU cannot directly fetch instruction from NAND, a special
+  software is required to copy bootcode from NAND to RAM.
+
+* A ROM bootloader which comes part of the ASIC which boots up first.
+
+== Problem of RAM
+
+=== SDRAM / DDR 
+
+* Every SoC would have memory controller for SDRAM/DDR which has to be
+  configured properly for the RAM Part chosen in hardware design.
+
+* It way involve Address Mapping, Timing parameters and etc., which
+  vary for different memory part nos.
+
+* ROM bootloader doesn't know about board specific parameters, so it
+  cannot load the bootloader to SDRAM without initialization.
+
+=== Internal SRAM
+
+* Every SoC has an internal SRAM which is used by the ROM bootloader
+  for its execution.
+
+* The SoC vendors designed a second level bootloader which is thin,
+  and would have board level initialization sequence.
+
+* Which can run from internal SRAM.
+
+* Secondary bootloaders would initialize the clocks and memory, then
+  bootstraps the Next software into DDR-SDRAM.
+
+* Secondary bootloaders are flashed in the boot devices like NAND
+  /eMMC.
+
+== Problem of OS
+
+=== OS Specfic Bootloaders
+
+* Most of the embedded Linux boards have multi-staged bootloading.
+
+* Since every Operating system has their own bootloading sequence,
+  like Linux needs some sequence, windows needs some other.
+
+* There exists third level bootloader which OS specific bootloader.
+
+* Linux bootloader know how to boot the Linux Operating Systetm.
+
+* Three staged bootloading is very common in most of the ARM
+  processors.
+
+=== DTS / DTB
+
+* Device Tree Source(DTS) is a description language which is used to
+  define the hardware details of a SoC like controller's addresses,
+  pinmap, irq, dma-channelses etc.,
+
+* DTS allows to represent even the board level informations like
+  system clock, I2C devices etc.,
+
+* DTS is a text based source file which can be developed as per the
+  target, which would be compiled to Device Tree Blobs (DTB).
+
+* Linux kernel expects DTBs for the target board in which the kernel
+  is executing.
+
+* Linux aware bootloader would pass DTB to Linux kernel for ARM/PPC
+  SoCs.
+
+=== Kernel
+
+* Linux kernel understands the hardware details from the DTB.
+
+* Then it loads and initializes the drivers for the hardware
+  specification.
+
+* Linux kernel mounts the root file system and leaves execution to
+  user applications.
+
+* Android patches few extra modules into the Linux kernel.
+
+=== Initramfs
+
+* Initramfs has a minimal filesystem to get the Linux system started.
+
+* It has kickstarts the first application and which starts running
+  init scripts which manage further boot process.
+
+* The init script mounts other partitions required for the system.
+
+* Sets the system properties for defined working.
+
+=== Boot Time Line
+
+image::figures/boot-timeline.png[]
+
+== Android Boot
+
+=== Init 
+
+* Android has its own init system, which is different from standard
+  Linux.
+
+* Even the role of init is same in both Android & Linux, the way the
+  init scripts are written are different.
+
+* It loads required kernel modules on bootup.
+
+* It mounts required filesystem on bootup.
+
+* It set environment variables of the system.
+
+* Init has to spawns several other native daemons(adbd, debuggerd,
+  service Manager) and zygote which runs in background.
+
+=== Native Daemons
+
+* adbd - ADB daemon for interaction from the host PC.
+
+* debuggerd - for capturing crash logs for the applications.
+
+* rild - radio interface layer daemon to control communication to the
+  modem.
+
+* vold - volume daemon to manage the storage volume.
+
+* netd - manages the network interface configuration.
+
+* servicemanager - which helps as a service registry, where all other
+  managers would register to.
+
+=== Boot Flow
+
+image::figures/android-boot.png[]
+
+=== Zygote
+
+* It is the significant process which starts the Java Virtual Machine
+  first.
+
+* It keeps itself preloaded with Java mandatory libraries, it can be
+  cloned whenever a new app is opened, which drastically reduces the
+  load time of the apps.
+
+* It starts the System Server, which spawns all other android
+  managers.
+
+* And at last your Home application is started
+
+=== System Server
+
+* System server spawns all other system services for making the
+  android framework layer up.
+
+* It starts system services like Activity Manager, Package Manager,
+  Surface Flinger and Audio Flinger etc.,
+
+== Qualcomm Specific 
+=== Qualcomm Boot Sequence
+
+image::figures/qual-boot.png[]
+
+=== References
+
+* Qualcomm Boot - https://lineageos.org/engineering/Qualcomm-Firmware/
+
+* Secured Boot - https://blog.quarkslab.com/analysis-of-qualcomm-secure-boot-chains.html
+
+* PBL - https://alephsecurity.com/2018/01/22/qualcomm-edl-1/
+
+* Boot - https://forum.xda-developers.com/android/general/info-boot-process-android-vs-linux-t3785254
+
+* Android Boot - http://kpbird.blogspot.com/2012/11/in-depth-android-boot-sequence-process.html
+
+* Android Boot - https://community.nxp.com/docs/DOC-102546
+
+* Android Init - https://proandroiddev.com/how-android-boot-up-9864376d911c
+
+* Zygote - https://medium.com/masters-on-mobile/the-zygote-process-a5d4fc3503db
