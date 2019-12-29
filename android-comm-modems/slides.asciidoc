@@ -1,0 +1,158 @@
+= Testing Communication Modems
+
+== WiFi 
+
+=== Qualcomm SoC
+
+* The SoC has wifi chipset within itself as a co-processor.
+
+* Apps processor communicates with co-processor send and receive data
+  from WiFi.
+
+=== Kernel
+
+* Kernel has TCP/IP stack 
+
+* Kernel has MAC 80211 stack which is the MAC layer implementation in
+  software.
+
+* AOSP Provides software components like `wpa_supplcant` which manages
+  the authentication.
+
+=== Checking WiFi
+
+* 
+----
+$ ls /sys/module/wlan/parameters/
+----
+
+* 
+----
+$ adb shell dumpsys wifi
+----
+
+* 
+----
+$ adb shell dumpsys netstats detail
+----
+
+*
+----
+$ ifconfig -a 
+----
+
+=== Wi-Fi Client in Open Authentication
+
+* Check the wifi interface got created and enable wlan interface
+
+----
+# ifconfig wlan0 up 
+----
+
+* Turn on wifi hotspot(AP) in your phone, keep it as an open
+  authentication(without password).
+
+* Check `iw wlan0 scan` to scan alive Access Point(AP)
+
+* Connect to specific AP 
+
+------
+# iw wlan0 connect <"AP Name">
+------
+
+* Check whether it is connected or not through
+
+----
+# iw wlan0 link
+----
+
+=== IP Configuration 
+
+* Join the IP Network of mobile by using
+
+----
+# dhcpcd wlan0 
+----
+
+* check IP address using
+
+----
+$ ifconfig
+----
+
+* Ping to a public server 
+
+----
+# ping 8.8.8.8
+----
+
+=== Performance Testing
+
+* `iperf` is a performance testing tool which can be used to measure
+  network performance.
+
+
+==  LTE
+
+=== Stack in Qualcomm SoC
+
+* Application's GSM control commands reached the native system service
+  `rild`.
+
+* `rild` forwards the request to `vendor ril hal`.
+
+* vendor ril hal would communicate with the modem.
+
+* The vendor ril hal implementation is called as Qualcomm Modem
+  Interface (QMI).
+
+* The QMI would talk to the modem using Shared Memory Device(SMD)
+  channels.
+
+
+
+=== Status Commands
+
+* When modem data connetion is up it would be shown as nework
+  interface, which can be viewed as `rmnet_data` with below command.
+
+----
+$ ifconfig -a
+----
+
+----
+$ adb shell dumpsys telephony-registry
+----
+
+----
+$ adb logcat -b radio -v color -d
+----
+
+=== Bluetooth
+
+* Android uses `bluedroid` as a bluetooth stack
+
+* Bludroid stack would communicate with bluetooth Modem.
+
+=== Bluetooth Status
+
+----
+$ adb shell dumpsys bluetooth
+----
+
+=== References
+
+
+* https://afewe.wordpress.com/android-arm-development/working-with-the-radio-layer-interface-ril-in-android/
+
+* http://www.wless.ru/files/GSM/Neoway/N720/Neoway_Android_RIL_Driver_User_Guide_V1_0.pdf
+
+* https://osmocom.org/projects/quectel-modems/wiki/QMI
+
+* https://osmocom.org/projects/quectel-modems/wiki/Qualcomm_Linux_SMD
+
+* https://wladimir-tm4pda.github.io/porting/telephony.html
+
+* https://android.googlesource.com/kernel/msm/+/android-msm-flo-3.4-kitkat-mr1/Documentation/usb/gadget_rmnet.txt
+
+* https://stackoverflow.com/questions/5780280/how-can-i-see-which-wakelocks-are-active 
