@@ -4,7 +4,7 @@ EXPORT_WIDTH  = 1024
 
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)
-images = figures/winxp-layout.png \
+#images = figures/winxp-layout.png \
 	      figures/linux-layout.png 
  
 all: slides.html

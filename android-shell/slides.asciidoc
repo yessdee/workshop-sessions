@@ -522,22 +522,27 @@ $ bg %1
     processes by command name is `killall` and the general syntax is
     `killall <command-name>`
 
+
 === Process - Try Out
 
-  . Suspend and resume process
-    * Start `top`.
-    * Press Ctrl-Z to suspend `top` 
-    * Resume `top` in the foreground.
-  . Suspend and background process
-    * Make a copy of `/usr/bin/xxx` to your home directory.
-    * Press Ctrl-Z during the copy, to suspend the copy.
-    * Resume the command in the background.
-  . Run in background
-    * Make a copy of `/usr/bin/xxx` in the background.
-  . Killing processes
-    * Start multiple copies in the background.
-    * Kill a copy process with the kill command.
-    * Check the file size to verify that the copy command terminated.
+  * Suspend and resume process
+    - Start `top`.
+    - Press Ctrl-Z to suspend `top` 
+    - Resume `top` in the foreground.
+  * Suspend and background process
+    - Run `sleep 100`
+    - Press Ctrl-Z during the sleep, to suspend the sleep.
+    - Resume the command in the background.
+  * Run in background
+    - Run `sleep 100` in the background.
+  * Killing processes
+    - Start multiple copies in the background.
+    - Kill a copy process with the kill command.
+    - Check the file size to verify that the copy command terminated.
+
+
+
+== File I/O
 
 === I/O Redirection
 
@@ -554,6 +559,7 @@ $ ls > myfile
 
   * Note that, when the output is redirected to a file, the original
     contents of the file will be lost.
+
 
 === Append 
 
@@ -575,6 +581,8 @@ $ ls > myfile
     redirection operator.
   * Join the 3 files using multiple `cat` commands and the redirection
     with append operator.
+
+== Backup
 
 === Shell Variables
 
@@ -670,6 +678,9 @@ $ cp "m&n-$i.txt" /tmp
   * Try copying each file to the directory `slash`, using the `\` quote.
   * Try copying each file to the directory `single`, using the `'` quote.
   * Try copying each file to the directory `double`, using the `"` quote.
+
+
+== Shell Scripting
 
 === Special Shell Variables
 
