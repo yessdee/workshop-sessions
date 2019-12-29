@@ -1,0 +1,384 @@
+= Android Debugging
+
+== Kernel Debugging
+
+=== Debugging Techniques
+
+
+  * Debugging by printing - debug information is displayed at suitable
+    points.
+
+  * Debugging by querying - debug information is provided when
+    requested by developer.
+
+  * Debugging by watching - code is debugged by watching its
+    interaction with another program.
+
+== Debugging through Printing
+
+=== Kernel Log
+
+* Kernel emits the log from most the driver when they 
+  - get initialized
+  - they find a new device
+  - on any hardware event.
+  - any failure or error
+
+* Dmesg can give a complete bootlog from the start of the kernel to
+  latest event.
+
+* Kernel logs would have a timestamp relative to the start of the
+  kernel.
+
+=== Kernel Log Levels
+
+  * Log messages are classified using log levels or severity levels.
+
+  * Log levels are required, since different messages from the kernel
+    can have different severity. For example consider `IBM mouse
+    detected` and `CPU overheating`.
+
+  * Severity level from 0 to 7. With smaller nos. having higher
+    severity.
+
+  * Log messages are prefixed by the severity level in angle brackets.
+
+  * Macros have been defined for each severity level.
+
+=== Critical Logs 
+
+  * `KERN_EMERG`
+
+    - Used for messages that precede a system crash or shutdown.
+    - Example: `CPU overheating`
+
+  * `KERN_ALERT`
+
+    - Used for messages that indicate situations requiring immediate
+      action.
+    - Example: `RAID: hard disk 1 failed`
+
+  * `KERN_CRIT`
+
+    - Used for messages that indicate serious hardware failures.
+
+  * `KERN_ERR`
+
+    - Used for messages that report error conditions.
+    - Example: `Failed to allocate DMA buffers`
+
+=== Information Logs
+
+  * `KERN_WARNING`
+
+    - Used for messages that indicate recoverable problems.
+    - Example: `Ethernet link down.`
+
+  * `KERN_NOTICE`
+
+    - Used for import informational messages.
+    - Example: `Floppy disk write protected.`
+
+  * `KERN_INFO`
+
+    - Used for messages that provide detected hardware information.
+    - Example: `Synaptics Touchpad, model: 1, fw: 6.2`
+
+  * `KERN_DEBUG`
+
+    - Used for messages useful only to developers.
+    - Example: `Received packet, dma buffer: 1, size: 234, from: 0001432AB12C`
+    
+=== Console
+
+  * One terminal is chosen to display kernel messages, and is called
+    console.
+
+  * By default the current virtual terminal is the console.
+
+  * Console can be changed to another device like the serial port by
+    passing appropriate boot arguments.
+
+=== Console Log Level
+
+
+  * Kernel log messages are sent to the log buffer and to all
+    active consoles.
+    
+  * The message is displayed only if the severity level is less than
+    `console_loglevel` numerically.
+
+  * The value can also be changed by writing to
+    `/proc/sys/kernel/printk`
+
+=== dmesg
+
+* the kernel logs are stored in kernel ring buffer
+
+* it can be printed at any time by command
+
+----
+$ dmesg
+----
+
+* dmesg prints complete history of the kernel from the boot, if you
+  want to look at last few lines
+
+----
+$ dmesg | tail -n 20
+----
+
+=== dmesg contd
+
+* to watch starting lines
+
+----
+$ dmesg | head -n 20
+----
+
+* to search for pattern
+
+----
+$ dmesg | grep -i "i2c"
+----
+
+=== Kernel Early Boot Issue
+
+* If the kernel has a early boot issue or problem in serial driver, we
+  may not see the bootlog in the console.
+
+* Even if the kernel bootlog is not printed in console, they may be
+  available in the kernel log buffer[RAM].
+
+* By accessing the kernel log buffer it is possible to debug the early
+  boot issues.
+
+* We can use Bootloader commands or JTAG to read the kernel logbuffer.
+
+* Kernel panics are also logged in NVM or NVRAM in few systems.
+
+== Debugging by Querying
+
+=== Pseudo Filesystems 
+
+  * Though very useful `printk()` also has deficiencies.
+
+  * `printk()` can considerably slow down the system, if the console
+    devices triggers lots of interrupts, and if the log information is
+    being synced to disk.
+
+  * It would be useful to know the value of variable or the state of
+    data structures at any given point in time.
+
+  * The values can be exported through virtual filesystems like
+    `/proc` and `/sys`, such that when a file is read the value of
+    the variable is obtained.
+
+=== Pseudo Filesystems 
+
+  * /proc` was developed to give process information and is being
+    misused to provide other information in an ad-hoc manner.
+
+  * `/sys` was designed to export the device model to userspace. It
+    does attach attributes associated with a device. But each file is
+    supposed to export only a single value.
+
+  * debugfs is another virtual filesystem usually mounted on `/debug`
+    that allows variables to be easily exported as files.
+
+=== Debugging through Sysfs
+
+* The device and driver binding can be debugged using sysfs
+
+* In `/sys/bus/platform/devices/`, we can find whether the platform
+  devices got populated.
+
+----
+$ ls /sys/bus/platform/devices/c*
+----
+
+=== Debugging through Sysfs (2)
+
+* In `/sys/bus/platform/drivers`, we can find whether the platform
+  drivers got loaded into kernel
+
+----
+$ adb ls "/sys/bus/platform/drivers/sdhci_msm/c084000.sdhci"
+----
+
+* In devices folder, if find link to the driver or vice versa, we can
+  conclude that the device and drivers are bound.
+
+----
+$ find -L /sys/bus/platform/devices -maxdepth 2 -name driver
+----
+
+=== Debugging through Debugfs
+
+* Kernel provides debug filesystem using which it is possible that
+  user can query frameworks and drivers
+
+----
+$ mount -t debugfs none /sys/kernel/debug
+----
+
+* To query any specific information from the drivers we can cat the
+  files under driver folder.
+
+=== Debugging through Debugfs (2)
+
+* Below example shows querying the IO information from mmc subsystem
+
+----
+mkz_sdm660_64:/ # cat /sys/kernel/debug/mmc0/ios                               
+clock:          0 Hz
+vdd:            7 (1.65 - 1.95 V)
+bus mode:       2 (push-pull)
+chip select:    0 (don't care)
+power mode:     2 (on)
+bus width:      3 (8 bits)
+timing spec:    8 (mmc DDR52)
+signal voltage: 0 (1.80 V)
+driver type:    0 (driver type B)
+----
+
+=== Debugging through Debugfs (3)
+
+* Below example shows querying the pinmux map for the i2c controller.
+
+----
+$ cat /sys/kernel/debug/pinctrl/pinctrl-maps | grep -n i2c
+2:device c176000.i2c
+3:state i2c_active
+----
+
+* Pull the file and view it with editor
+
+
+-----
+adb pull /sys/kernel/debug/pinctrl/pinctrl-maps  
+-----
+
+=== Ram Dump
+
+* ramdump which contains the panic or log for previous shutdown.
+
+----
+$ cat /sys/fs/pstore/console-ramoops-0
+----
+
+* pstore is not mounted then it need to be mounted as
+
+----
+$ mount -t pstore -o kmsg_bytes=8000 - /sys/fs/pstore
+----
+
+
+== Application Debugging
+
+=== Debugging through Android Logger
+
+* Android provides specialized logging infrastructure where the
+  Android Framework and Applications can log their status.
+
+* To see the android logs use logcat command
+
+----
+$adb logcat
+----
+
+* logcat prints lots of log, all of them would not be useful to us.
+
+
+* Log messages will have `priority`/`Tag`, tag indicating message from
+  which app or component, priority of the message.
+
+----
+12-14 10:46:02.901  1837  1837 D ConnectivityManager: getMobileDataEnabled()- subId=0 retVal=true
+----
+
+* `12-14 10:46:02.901` -  MM-DD Time
+
+* `D` - debug Priority
+
+* `Connectivity Manager` - Tag 
+
+* `getMobileDataEnabled()- subId=0 retVal=true` - Log
+
+
+=== Log Message Fields
+
+
+* Log messages will have `priority`/`Tag`, tag indicating message from
+  which app or component, priority of the message.
+
+* Below prints all Warning(W) on all(*) tags
+
+----
+$ adb logcat *:W 
+----
+
+=== Log Verbosity
+
+* We can change the verbosity of the log messages like `brief`,
+  `long`, etc.,
+
+----
+$ adb logcat -v brief
+----
+
+=== Log Buffers
+
+* ADB logger has different buffers in which logs are stored sera
+
+----
+$adb logcat -b radio
+
+12-14 10:52:19.182  2890  2915 I AT      : m0_28>AT+CREG?
+----
+
+== Dumpsys
+
+=== Intro
+
+* It provides information on the system services running android.
+
+* It can provide verbose disgnostics information on the each system
+  service
+
+
+=== Usage
+
+* Listing the services which dumpsys can collect log. 
+
+----
+$ adb shell dumpsys -l
+----
+
+* To check dumpsys log of any service
+
+----
+$ adb shell dumpsys gfxinfo  
+----
+
+=== Tryout
+
+* Find the time of eMMC driver detected
+
+* Find partitions in the eMMC
+
+* Plug the pendrive and check what is the make of the pendrive.
+
+=== References
+
+* https://elinux.org/Android_Logging_System
+
+* https://blueprints.launchpad.net/linux-linaro/+spec/android-ram-console
+
+* https://stackoverflow.com/questions/28538091/using-persistant-storage-in-linux-kernel
+
+* https://developer.android.com/studio/command-line/logcat
+
+* https://developer.qualcomm.com/qfile/28823/lm80-p0436-11_adb_commands.pdf
+
+* https://developer.qualcomm.com/qfile/28825/lm80-p0436-8_thermal_debugging_guide.pdf
