@@ -1,0 +1,477 @@
+= Core Hardware Bringup 
+
+== SoC
+
+=== Embededded SoC
+
+image::figures/soc.png[]
+
+=== Mobile SoC
+
+image::figures/mobile-soc.png[]
+
+=== SDM660
+
+|======================
+|CPU          | 8 x Kryo 260 CPU
+|GPU          | Adreno 512 GPU
+|DSP          | Hexagon 680 
+|ISP          | Spectra 160
+|BB Modem     | X12 LTE
+|Connectivity | WCN3980
+|Location     |   
+|Memory       | LPDDR4
+|=========================
+
+=== Boot Sequence
+
+The SoC to bootup all the has to be flashed in right location of flash
+memory.
+
+* xbl, abl and other images
+
+* boot, system and user images
+
+* other images based on the configuration.
+
+== BootLoader
+
+=== Qualcomm Specific Bootloaders 
+
+* They are not interactive and they also cannot be interacted with adb
+  commands.
+
+* We can watch only log through serial port or use a jtag to view
+  them.
+
+=== PBL Log
+
+----
+B -         0 - PBL, Start
+B -      7027 - bootable_media_detect_entry, Start
+B -     86295 - bootable_media_detect_success, Start
+B -     86300 - elf_loader_entry, Start
+B -     88165 - auth_hash_seg_entry, Start
+B -     88495 - auth_hash_seg_exit, Start
+B -    136831 - elf_segs_hash_verify_entry, Start
+B -    184523 - elf_segs_hash_verify_exit, Start
+B -    184535 - auth_xbl_sec_hash_seg_entry, Start
+B -    213651 - auth_xbl_sec_hash_seg_exit, Start
+B -    213653 - xbl_sec_segs_hash_verify_entry, Start
+B -    220369 - xbl_sec_segs_hash_verify_exit, Start
+B -    220415 - PBL, End
+
+----
+
+=== XBL Log
+----
+B -    246409 - SBL1, Start
+B -    371185 - BootTempCheck: Device Temp: 32C
+B -    371185 - usb: hs_phy_nondrive_start
+B -    378627 - boot_flash_init, Start
+B -    385977 - sbl1_ddr_set_default_params, Start
+B -    393968 - boot_config_data_table_init, Start
+B -    452803 - Using default CDT
+B -    454755 - CDT Version:3,Platform ID:11,Major ID:1,Minor ID:0,Subtype:0
+D -       488 - Segments hash check
+D -     12627 - PMIC Image Loaded, Delta - (34384 Bytes)
+B -    476166 - pm_device_init, Start
+B -    483425 - PM: PON REASON: PM0=0x8000028000000001:0x2000 PM1=0x8000088000000020:0x800 
+D -     45841 - pm_device_init, Delta
+B -    527680 - pm_driver_init, Start
+B -    554124 - vsense_init, Start
+D -         0 - vsense_init, Delta
+B -    626988 - Pre_DDR_clock_init, Start
+D -         0 - sbl1_ddr_set_params, Delta
+B -    644800 - DSF version = 37.0, DSF RPM version = 22.0
+B -    647088 - Max Frequency = 1804 MHz
+B -    652425 - do_ddr_training, Start
+B -    664808 - Bootup frequency set to 1296000
+D -      8784 - do_ddr_training, Delta
+B -    684664 - clock_init, Start
+D -      2104 - APDP Image Loaded, Delta - (0 Bytes)
+B -    692685 - usb: EMMC Serial - ed5175ad
+B -    697474 - usb: fedl, vbus_low
+B -    704733 - PM: 0: PON=0x1:HARD_RESET: ON=0x80:PON_SEQ: POFF=0x2:PS_HOLD: OFF=0x80:POFF_SEQ: FAULT2=0x20:PBS_NACK
+B -    704824 - PM: 1: PON=0x20:PON1: ON=0x80:PON_SEQ: POFF=0x8:GP1: OFF=0x80:POFF_SEQ: FAULT2=0x8:FAULT_N
+B -    724161 - sbl1_efs_handle_cookies, Start
+D -     11346 - QSEE Dev Config Image Loaded, Delta - (42076 Bytes)
+D -     64843 - QSEE Image Loaded, Delta - (1946648 Bytes)
+D -     17842 - QHEE Image Loaded, Delta - (273136 Bytes)
+D -     16988 - RPM Image Loaded, Delta - (219388 Bytes)
+D -      3965 - STI Image Loaded, Delta - (0 Bytes)
+D -     11377 - ABL Image Loaded, Delta - (117328 Bytes)
+D -     34221 - APPSBL Image Loaded, Delta - (1792000 Bytes)
+B -    919788 - SBL1, End
+D -    678290 - SBL1, Delta
+S - Flash Throughput, 84000 KB/s  (4434268 Bytes,  52236 us)
+S - DDR Frequency, 1296 MHz
+----
+
+=== ABL Log 
+
+----
+UEFI Start     [ 1094] SEC
+PROD Mode   : On
+DEBUG Mode : On
+ASLR        : On
+Timer Delta : +7 mS
+RAM Entry 0 : Base 0x0000000080000000  Size 0x0000000080000000
+RAM Entry 1 : Base 0x0000000100000000  Size 0x000000007E3C0000
+UEFI Ver    : 4.2.191107.BOOT.XF.1.4-00267-S660LZB-1
+Build Info  : 64b Nov  7 2019 02:03:12
+Boot Device : eMMC
+DALLOG Device [0x2000145]: Cannot turn on source[ACPL
+read_partition: ANDROID-0006
+DisplayDxe: display is turned on, device_info_status = 0
+Render Splash  [ 1643]
+LoadSecureApps: Load app from partition(keymaster): Status = 0x0, AppId = 65537
+APC1 IDDQ WC 0 , L2:0, CPU[0]:175, CPU[1]:175, CPU[2]:175, CPU[3]:175
+ APC1 Total 700
+Load CPU 0 Slp: 0x92, Int: 0x13
+Load CPU 1 Slp: 0x1, Int: 0x0
+Load CPU 2 Slp: 0xCA, Int: 0xFFFFFFC9
+Load CPU 3 Slp: 0x1, Int: 0x0
+GLD IDDQ WC 0
+CPU PART GOOD [0x0] SUB_BIN[0x0]
+-----------------------------
+Platform Init  [ 1779] BDS
+UEFI Ver   : 4.2.191107.BOOT.XF.1.4-00267-S660LZB-1
+Platform   : QRD
+Chip Name  : SDM660
+Chip Ver   : 1.0
+Core 0 Freq: 1382400 MHz
+-----------------------------
+UEFI Total : 701 ms
+POST Time      [ 1795] OS Loader
+Loader Build Info: Nov  6 2019 20:14:33
+GIT Baseline Tag: MKZ_O_TRAIN_CI_201911051210
+read_partition: ANDROID-0006
+Updating DeviceInfo Structure
+GetMsiCameraID():358 returned 1
+Board Display ID: 0x00000006
+Board Type = 5 (0x1145 nCode, 505943 uV) MKZ_CB
+Platform is 11
+GPIO 9 input level: 0
+Board Type = 5 (0x1145 nCode, 505943 uV) MKZ_CB
+This is MKZ!
+Board Revision 0x0 (0) MKZ_CB1
+Board Type = 5 (0x1146 nCode, 506057 uV) MKZ_CB
+Mkz detected, configuring gpio13
+Gpio 13 status: 1 uRetryCount: 1
+Mkz Device - BootIntoFastboot = 0x00000000
+GetRebootReason() returned: 0x00000000
+Recovery command: 32 bootonce-bootloader
+RecoveryInit() returned: 0x00000000
+Always return BP ON for Mkz
+Booting from slot (_a)
+Loading Image Start : 1874 ms
+Loading Image Done : 1875 ms
+Total Image Read size : 2048 Bytes
+Loading Image Start : 1875 ms
+Loading Image Done : 2033 ms
+Total Image Read size : 27107328 Bytes
+VB: DeviceInit: Device is unlocked! Skipping verification!
+VB: VerifyImage: Image verification done! boot state is: ORANGE
+Display menu is not enabled!
+Device is unlocked, Skipping boot verification
+Unofficial image or lab cert installed, changing boot logo
+DisplayDxe: brightness value read from devinfo = 40 
+DrawBMPFile is successful
+----
+
+=== UEFI Log
+
+----
+Memory Base Address: 0x80000000
+Decompressing kernel image start: 2078 ms
+Decompressing kernel image done: 2502 ms
+Board Display ID: 0x00000006
+Board Type = 5 (0x1146 nCode, 506057 uV) MKZ_CB
+Cmdline: console=ttyMSM0,115200,n8 androidboot.console=ttyMSM0 earlycon=msm_serial_dm,0xc170000 androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x37 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 sched_enable_hmp=1 sched_enable_power_aware=1 service_locator.enable=1 swiotlb=1 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3 buildvariant=userdebug veritykeyid=id:7e4333f9bba00adfe0ede979e28ed1920492b40f root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/mmcblk0p14" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=c0c4000.sdhci androidboot.serialno=ed5175ad androidboot.mrvalues=0xFF000110 androidboot.crash_to_usb=0 androidboot.model=H90XDU9RA1AN androidboot.hardware_rev=MKZ_CB1 androidboot.display_id=6 androidboot.lte_board_id=00010000 androidboot.product_id=MKZ_CB androidboot.chipserialno=EB0D8C71 androidboot.vendor.motorolasolutions.ap_esn=00000001ED5175ADEB0D8C71 androidboot.bootid=84E5690E androidboot.lte_region=Unprogrammed androidboot.baseband=sdm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_hx8363b_video:config0:1:none:cfg:single_dsi androidboot.abootversion=v1.01 androidboot.slot_suffix=_a skip_initramfs rootwait ro init=/init
+Best match DTB tags 317/0056000B/0x00000000/0/1001B/1011A/0/0/(offset)0x98F80A53/(size)0x0005021A
+Using pmic info 0x1001B/0x1011A/0x0/0x0 for device 0x2001B/0x102001A/0x0/0x0
+Memory Base Address: 0x80000000
+RAM Partitions
+Adding Base: 0x0000000080000000 Available Length: 0x0000000080000000 
+Adding Base: 0x0000000100000000 Available Length: 0x000000007E3C0000 
+
+Shutting Down UEFI Boot Services: 2580 ms
+WriteLogBufToPartition():1772 Writing to Filename:"UefiLog00000000029.txt"
+WriteLogBufToPartition():1799 Writing to Filename:"UefiLog0.txt"
+Exit BS        [ 2846] UEFI End
+
+----
+
+== CPU
+
+===  MultiCore
+
+* Generally Linux is a Symetri Multi Processing (SMP) operating
+  system.
+
+* Same operating would manage all the cores.
+
+* Kernel's scheduler can schedule the processes in all the core it
+  manages.
+
+* Core `0` would kick-off first and later it boots-straps all other
+  cores.
+
+=== To Get CPU info  
+
+* To get CPU related information 
+
+----
+$ cat /proc/cpuinfo 
+----
+
+* To control per cpu status it can be done through sysfs
+   
+----
+ls /sys/devices/system/cpu/
+----
+
+=== Enabling and Disabling Cores
+
+* Check online CPUs
+----
+$ cat /sys/devices/system/cpu/online
+----
+
+* To Check Core 1 is online 
+
+----
+$ cat /sys/devices/system/cpu/cpu1/online 
+----
+
+* To enable core 1 
+
+----
+
+$ echo 1 > /sys/devices/system/cpu/cpu1/online
+----
+
+=== Benchmarking Tools
+
+* We can run standard Linux benchmarking tools
+
+* `lmbench` and `stress` can be used to stress the CPU, memory and
+  storages.
+
+* GFXBench like apps can be used for GPU benchmarkimg
+
+=== lmbench
+
+* lmbench is a command line tool for benchmarking basic os and hardware
+
+* It has features to test memory copies, IPCs, network bandwidth etc.,
+
+* Can run the lmbench tests as
+
+----
+$ run-lmbench
+----
+
+== Memory
+
+=== Getting Memory Information
+
+* To see memory availability we can check
+
+----
+$ cat /proc/meminfo
+----
+
+* to see free memories
+
+----
+$ free
+----
+
+=== DDR Memory Tests
+
+* Generally lmbench runs read/write bandwidth tests in RAM.
+
+* If the DDR has to be tested for other issues like timing, struck at
+  1/0, we may need to run walking 1s and walking 0s tests.
+
+* These are executed using bootloaders 
+
+== GPU
+
+=== Kernel Graphics Support Layer
+
+* KGSL in short is the GPU driver for qualcomm processors
+
+* Certain parameters of the GPU can be tuned using 
+
+----
+$ ls /sys/class/kgsl/kgsl-3d0
+----
+
+----
+$ adb shell dumpsys gfxinfo
+$ adb shell dumpsys gfxinfo <PACKAGE_NAME> framestats
+----
+
+* android apps like GFXBench can be used for benchmarking.
+
+== Storage
+
+=== Filesystems Listing
+
+* Generarlly storage related tests are done on top of filesystems.
+
+* List partitions
+
+----
+$ cat /proc/partitions
+----
+
+=== Filesystems Test
+
+* Filesystem benchmarking tools can be used to test the performance of
+  the filesystem.
+
+* `iozone` is the tool which can be used to benchmark filesystems.
+
+=== Iozone
+
+* we can run all tests as below '-a` is for automatic mode
+
+----
+$ iozone -a
+----
+
+* To run specific tests like read or write can be done as below `-i`
+  denotes the test type.
+
+----
+$ iozone -a -i 0 
+----
+
+=== Test Options
+
+* We can pass below values for i for specific tests
+
+----
+0=write/rewrite
+1=read/re-read
+2=random-read/write
+3=Read-backwards
+4=Re-write-record
+5=stride-read
+6=fwrite/re-fwrite
+7=fread/Re-fread,
+8=random mix
+9=pwrite/Re-pwrite
+10=pread/Re-pread
+11=pwritev/Re-pwritev
+12=preadv/Re-preadv
+----
+
+== Compatibility Tests
+
+=== Compatibility Test Suite 
+
+* For Android CTS 8.1
+https://dl.google.com/dl/android/cts/android-cts-8.1_r17-linux_x86-arm.zip
+
+* For Android CTS 9.0
+https://dl.google.com/dl/android/cts/android-cts-9.0_r10-linux_x86-arm.zip
+
+=== CTS  Usage
+
+ Make sure adb and aapt are present in PATH.
+
+* To run cts tradefed
+---- 
+$ ./android-cts/tools/cts-tradefed
+----
+
+* To run cts test suite
+---- 
+ cts-tradefed > run cts
+----
+* To list devices
+---- 
+> list devices
+----
+* To list test plan name
+----  
+> list modules
+----
+=== CTS Usage Contd.
+
+* To run a single module
+----
+> run cts --plan test_plan_name
+----
+
+* To list results success or failure or to get "session number"
+----
+> list results
+----
+
+* To retry failed tests
+---- 
+> run retry --retry session_number
+----
+
+  --logcat - can be passed along with run command to get more info.
+  --screenshoot-on-failure - to take screenshots on target to get proof.
+  --skip-preconditions - for faster development testing.
+  --shard-count number_of_shards - to run parallel on multiple devices.
+
+== Vendor Test Suite
+
+=== Building VTS
+
+* We need to build from the AOSP source code,
+https://codelabs.developers.google.com/codelabs/android-vts/#1
+
+* It's not prebuilt from google.
+
+* Get into AOSP source folder which is already built for the target
+  board
+
+* We can enable VTS tests suite as below
+
+---
+$ make vts ENABLE_TREBLE=true -j8
+---
+
+=== VTS Usage
+
+* Connect the target machine through usb cable and run below test.
+
+----
+$ vts-tradefed
+> run vts
+----
+    
+* The output would be stored in the
+  `out/host/linux-x86/vts/android-vts/results/` folder.
+
+* Tests logs can be seen in
+  `out/host/linux-x86/vts/android-vts/logs/`.
+
+=== References
+
+*
+  https://www.inforcecomputing.com/public_docs/Qualcomm%20Snapdragon%20410%20APQ8016%20Device%20Specification.pdf
+
+*
+  https://developer.qualcomm.com/qfile/28823/lm80-p0436-11_adb_commands.pdf
+
+*
+  https://www.anandtech.com/show/9552/qualcomm-details-hexagon-680-dsp-in-snapdragon-820-accelerated-imaging
+
+*
+  https://stackoverflow.com/questions/45236131/total-frames-and-janky-frames-in-dumpsys-gfxinfo-report
+
+*
+  https://android.googlesource.com/platform/test/vts/+/b8812f272dd06c8d8c4fb18ea29e49519af6d955/doc/user_manual.md
+
+* https://wiki.ubuntu.com/Kernel/Reference/stress-ng
